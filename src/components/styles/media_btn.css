@@ -1,0 +1,20 @@
+.social_btn {
+    height: 30px;
+    width: 163px;
+    display: inline-flex;
+}
+.social_btn img{
+    height: 70%;
+    margin: auto 0;
+}
+.social_btn p{
+    margin: auto 11px;
+    font-size:14px;
+    font-weight: bold;
+}
+.status-bar-field{
+    flex-grow: 0;
+}
+.status-bar{
+    width:335px;
+}

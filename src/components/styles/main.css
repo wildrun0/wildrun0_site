@@ -1,0 +1,23 @@
+.main-containter{
+    width:650px;
+    margin:0 auto;
+}
+.about-grid img{
+    height: 400px;
+}
+.about-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap:10px;
+}
+blockquote {
+    margin: 0 0 20px;
+    padding: 20px;
+    background: #dfdfdf;
+}
+.title-bar-text{
+    cursor: default;
+}
+.window{
+    background:silver;
+}
