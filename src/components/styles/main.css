@@ -1,6 +1,8 @@
 .main-containter{
     width:650px;
-    margin:0 auto;
+}
+.cursor{
+    cursor: pointer;
 }
 .about-grid img{
     height: 400px;

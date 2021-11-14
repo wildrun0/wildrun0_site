@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import Draggable from 'react-draggable';
 import MediaBtn from '../components/media_btn';
 
@@ -9,12 +9,17 @@ import inst_logo from '../icons/insta.png'
 
 const Main = () => {
     return(
-        <Draggable bounds={{top: 0, left: -400, right: 400, bottom: 200}} handle="strong">
+        <Draggable bounds="html" handle="strong" defaultPosition={{x: document.documentElement.offsetWidth/2-325, y: 0}}>
             <div className="main-containter">
                 <div class="window" >
                     <strong className="cursor">
                         <div class="title-bar">
                             <div class="title-bar-text">About wildrun0</div>
+                            <div class="title-bar-controls">
+                                <button aria-label="Minimize"></button>
+                                <button aria-label="Maximize"></button>
+                                <button aria-label="Close"></button>
+                            </div>
                         </div>
                     </strong>
                     <div class="window-body">
