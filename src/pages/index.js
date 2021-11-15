@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
-import Layout from '../components/layout'
+import Layout from '../components/Layout'
 
 import Play from './play'
 import Main from './main'
 import Files from './files'
 
-const Pages = () =>{
+const Pages = () => {
     useEffect(() => {
         document.title = "wildrun0 home"
     });

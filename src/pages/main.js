@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react'
 import Draggable from 'react-draggable';
-import MediaBtn from '../components/media_btn';
+import MediaButton from '../components/MediaButton';
 
 import '../components/styles/main.css'
 import me from "../icons/me.png"
@@ -24,7 +24,7 @@ const Main = () => {
                     </strong>
                     <div class="window-body">
                         <div className="about-grid">
-                            <img src={me}></img>
+                            <img src={me} alt="I am"></img>
                             <div className='about-main'>
                                 <blockquote>
                                     very good man i really appreciate him id like to fuck him
@@ -34,10 +34,10 @@ const Main = () => {
                     </div>
                     <div class="status-bar">
                         <p class="status-bar-field">
-                            <MediaBtn href="https://vk.com/wildrun0" SOCIAL_LOGO_NAME={vk_logo} text="VK"></MediaBtn>
+                            <MediaButton href="https://vk.com/wildrun0" SOCIAL_LOGO_NAME={vk_logo} text="VK"></MediaButton>
                         </p>
                         <p class="status-bar-field">
-                            <MediaBtn href="https://instagram.com/wildrun0" SOCIAL_LOGO_NAME={inst_logo} text="INSTAGRAM"></MediaBtn>
+                            <MediaButton href="https://instagram.com/wildrun0" SOCIAL_LOGO_NAME={inst_logo} text="INSTAGRAM"></MediaButton>
                         </p>
                     </div>
                 </div>
