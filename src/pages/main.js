@@ -29,8 +29,11 @@ const Main = () => {
         const pointLight = new THREE.PointLight(0xfffffff)
         pointLight.position.set(5,5,5)
 
-        const ambientLight = new THREE.AmbientLight(0xffffffff)
-        scene.add(pointLight, ambientLight)
+        const directionalLight = new THREE.DirectionalLight(0xfffffff, 3)
+        directionalLight.position.set(0,5,10)
+
+        const ambientLight = new THREE.AmbientLight(0xfffffff)
+        scene.add(pointLight, ambientLight, directionalLight)
 
         const skyTexture = new THREE.TextureLoader().load('sky.jpeg')
         scene.background = skyTexture
