@@ -1,4 +1,4 @@
-.main-containter{
+.info-container{
     width:650px;
 }
 .cursor{
@@ -22,4 +22,14 @@ blockquote {
 }
 .window{
     background:silver;
+}
+.model-containter{
+    width: fit-content;
+    height:150px;
+}
+.container {
+    display: grid;
+    grid-template-columns: 0fr 0fr;
+    grid-gap: 15px;
+    justify-content: center;
 }

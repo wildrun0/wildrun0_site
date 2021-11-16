@@ -9,8 +9,7 @@ import inst_logo from '../icons/insta.png'
 
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 const Main = () => {
 
     useEffect(() => {
@@ -20,20 +19,20 @@ const Main = () => {
             canvas: document.querySelector("#bg")
         })
         const loader = new GLTFLoader();
-        const controls = new OrbitControls(camera, renderer.domElement)
+        // const controls = new OrbitControls(camera, renderer.domElement)
         
         renderer.setPixelRatio(window.devicePixelRatio)
-        renderer.setSize(500, 500)
+        renderer.setSize(350, 350)
         camera.position.setZ(30)
 
         const pointLight = new THREE.PointLight(0xfffffff)
-        pointLight.position.set(5,5,5)
+        pointLight.position.set(5,-10, 5)
 
         const directionalLight = new THREE.DirectionalLight(0xfffffff, 3)
-        directionalLight.position.set(0,5,10)
+        directionalLight.position.set(0,-50,0)
 
         const ambientLight = new THREE.AmbientLight(0xfffffff)
-        scene.add(pointLight, ambientLight, directionalLight)
+        scene.add(pointLight, directionalLight, ambientLight)
 
         const skyTexture = new THREE.TextureLoader().load('sky.jpeg')
         scene.background = skyTexture
@@ -42,10 +41,12 @@ const Main = () => {
         loader.load('ebasos/scene.gltf', function (gltf) {
             const alex = gltf.scene.children[0]
             model = alex
+
             alex.scale.set(7,7,7)
             alex.position.set(0,-20,0)
-            scene.add(gltf.scene)
-            renderer.render(scene, camera)
+
+            scene.add(gltf.scene);
+            renderer.render(scene, camera);
         }, undefined, function (error) {
             console.error(error);
         });
@@ -53,80 +54,72 @@ const Main = () => {
         
         const animate = () => {
             requestAnimationFrame(animate)
-            model.rotation.z += 0.01
-            controls.update()
+            model.rotation.z += 0.004
+            // controls.update()
             renderer.render(scene, camera)
         }
-
         animate()
     })
 
     return(
         <React.Fragment>
-            <Draggable bounds="html" handle="strong" defaultPosition={{x: document.documentElement.offsetWidth/2-325, y: 0}}>
-                <div className="main-containter">
-                    <div className="window" >
-                        <strong className="cursor">
-                            <div className="title-bar">
-                                <div className="title-bar-text">About wildrun0</div>
-                                <div className="title-bar-controls">
-                                    <button aria-label="Minimize"></button>
-                                    <button aria-label="Maximize"></button>
-                                    <button aria-label="Close"></button>
+            <div className="container">
+                <Draggable bounds="html" handle="strong" >
+                    <div className="info-container">
+                        <div className="window" >
+                            <strong className="cursor">
+                                <div className="title-bar">
+                                    <div className="title-bar-text">About wildrun0</div>
+                                    <div className="title-bar-controls">
+                                        <button aria-label="Minimize"></button>
+                                        <button aria-label="Maximize"></button>
+                                        <button aria-label="Close"></button>
+                                    </div>
+                                </div>
+                            </strong>
+                            <div className="window-body">
+                                <div className="about-grid">
+                                    <img src={me} alt="I am"></img>
+                                    <div className='about-main'>
+                                        <blockquote>
+                                            very good man i really appreciate him id like to fuck him
+                                        </blockquote>
+                                    </div>
                                 </div>
                             </div>
-                        </strong>
-                        <div className="window-body">
-                            <div className="about-grid">
-                                <img src={me} alt="I am"></img>
-                                <div className='about-main'>
-                                    <blockquote>
-                                        very good man i really appreciate him id like to fuck him
-                                    </blockquote>
-                                </div>
+                            <div className="status-bar">
+                                <p className="status-bar-field">
+                                    <MediaButton href="https://vk.com/wildrun0" SOCIAL_LOGO_NAME={vk_logo} text="VK"></MediaButton>
+                                </p>
+                                <p className="status-bar-field">
+                                    <MediaButton href="https://instagram.com/wildrun0" SOCIAL_LOGO_NAME={inst_logo} text="INSTAGRAM"></MediaButton>
+                                </p>
                             </div>
-                        </div>
-                        <div className="status-bar">
-                            <p className="status-bar-field">
-                                <MediaButton href="https://vk.com/wildrun0" SOCIAL_LOGO_NAME={vk_logo} text="VK"></MediaButton>
-                            </p>
-                            <p className="status-bar-field">
-                                <MediaButton href="https://instagram.com/wildrun0" SOCIAL_LOGO_NAME={inst_logo} text="INSTAGRAM"></MediaButton>
-                            </p>
                         </div>
                     </div>
-                </div>
-            </Draggable>
-
-            <Draggable bounds="html" handle="strong" defaultPosition={{x: document.documentElement.offsetWidth/2-325, y: 0}}>
-                <div className="main-containter">
-                    <div className="window" >
-                        <strong className="cursor">
-                            <div className="title-bar">
-                                <div className="title-bar-text">About wildrun0</div>
-                                <div className="title-bar-controls">
-                                    <button aria-label="Minimize"></button>
-                                    <button aria-label="Maximize"></button>
-                                    <button aria-label="Close"></button>
+                </Draggable>
+                <Draggable bounds="html" handle="strong">
+                    <div className="model-containter">
+                        <div className="window" >
+                            <strong className="cursor">
+                                <div className="title-bar">
+                                    <div className="title-bar-text">3D MODEL</div>
+                                    <div className="title-bar-controls">
+                                        <button aria-label="Minimize"></button>
+                                        <button aria-label="Maximize"></button>
+                                        <button aria-label="Close"></button>
+                                    </div>
                                 </div>
-                            </div>
-                        </strong>
-                        <div className="window-body">
-                            <canvas id="bg">
+                            </strong>
+                            <div className="window-body">
+                                <canvas id="bg">
 
-                            </canvas>
-                        </div>
-                        <div className="status-bar">
-                            <p className="status-bar-field">
-                                 Сашa самый луший
-                            </p>
-                            <p className="status-bar-field">
-                                zochem я это написал ахах
-                            </p>
+                                </canvas>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </Draggable>
+                </Draggable>
+            </div>
         </React.Fragment>
     )
 }
