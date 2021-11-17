@@ -1,8 +1,11 @@
+body{
+    background-color: #a3a3a3
+}
+#bg{
+    cursor:grab;
+}
 .info-container{
     width:650px;
-}
-.cursor{
-    cursor: pointer;
 }
 .about-grid img{
     height: 400px;
@@ -23,9 +26,9 @@ blockquote {
 .window{
     background:silver;
 }
-.model-containter{
+.model-container{
     width: fit-content;
-    height:150px;
+    height: fit-content;
 }
 .container {
     display: grid;

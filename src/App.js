@@ -1,5 +1,5 @@
 import './App.css';
-import '98.css'
+import '98.css';
 import React from 'react'
 import Pages from './pages';
 

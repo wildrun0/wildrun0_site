@@ -9,9 +9,10 @@ import inst_logo from '../icons/insta.png'
 
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-const Main = () => {
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import WindowsDiv from '../components/WindowsDiv';
 
+const Main = () => {
     useEffect(() => {
         const scene = new THREE.Scene()
         const camera = new THREE.PerspectiveCamera(90, 500 / 500, 0.1, 1000)
@@ -19,7 +20,7 @@ const Main = () => {
             canvas: document.querySelector("#bg")
         })
         const loader = new GLTFLoader();
-        // const controls = new OrbitControls(camera, renderer.domElement)
+        const controls = new OrbitControls(camera, renderer.domElement)
         
         renderer.setPixelRatio(window.devicePixelRatio)
         renderer.setSize(350, 350)
@@ -51,32 +52,28 @@ const Main = () => {
             console.error(error);
         });
 
-        
         const animate = () => {
             requestAnimationFrame(animate)
             model.rotation.z += 0.004
-            // controls.update()
+            controls.update()
             renderer.render(scene, camera)
         }
         animate()
-    })
-
+    });
     return(
         <React.Fragment>
             <div className="container">
-                <Draggable bounds="html" handle="strong" >
+                <Draggable bounds="html" handle=".title-bar" >
                     <div className="info-container">
                         <div className="window" >
-                            <strong className="cursor">
-                                <div className="title-bar">
-                                    <div className="title-bar-text">About wildrun0</div>
-                                    <div className="title-bar-controls">
-                                        <button aria-label="Minimize"></button>
-                                        <button aria-label="Maximize"></button>
-                                        <button aria-label="Close"></button>
-                                    </div>
+                            <div className="title-bar">
+                                <div className="title-bar-text">About wildrun0</div>
+                                <div className="title-bar-controls">
+                                    <button aria-label="Minimize"></button>
+                                    <button aria-label="Maximize"></button>
+                                    <button aria-label="Close"></button>
                                 </div>
-                            </strong>
+                            </div>
                             <div className="window-body">
                                 <div className="about-grid">
                                     <img src={me} alt="I am"></img>
@@ -98,27 +95,9 @@ const Main = () => {
                         </div>
                     </div>
                 </Draggable>
-                <Draggable bounds="html" handle="strong">
-                    <div className="model-containter">
-                        <div className="window" >
-                            <strong className="cursor">
-                                <div className="title-bar">
-                                    <div className="title-bar-text">3D MODEL</div>
-                                    <div className="title-bar-controls">
-                                        <button aria-label="Minimize"></button>
-                                        <button aria-label="Maximize"></button>
-                                        <button aria-label="Close"></button>
-                                    </div>
-                                </div>
-                            </strong>
-                            <div className="window-body">
-                                <canvas id="bg">
-
-                                </canvas>
-                            </div>
-                        </div>
-                    </div>
-                </Draggable>
+                <WindowsDiv title="3D MODEL" className="model-container" drag={true}>
+                    <canvas id="bg"></canvas>
+                </WindowsDiv>
             </div>
         </React.Fragment>
     )
