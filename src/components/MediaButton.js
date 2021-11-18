@@ -1,6 +1,6 @@
 import React from "react";
 
-import './styles/media_btn.css'
+import './styles/MediaButton.css'
 
 
 const MediaButton = props => {

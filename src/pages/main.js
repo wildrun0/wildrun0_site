@@ -1,8 +1,9 @@
 import React, {useEffect} from 'react'
-import Draggable from 'react-draggable';
 import MediaButton from '../components/MediaButton';
+import WindowsDiv from '../components/WindowsDiv';
 
-import '../components/styles/main.css'
+import './styles/Main.css'
+
 import me from "../icons/me.png"
 import vk_logo from '../icons/vk.svg'
 import inst_logo from '../icons/insta.png'
@@ -10,7 +11,6 @@ import inst_logo from '../icons/insta.png'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import WindowsDiv from '../components/WindowsDiv';
 
 const Main = () => {
     useEffect(() => {
@@ -58,48 +58,33 @@ const Main = () => {
             controls.update()
             renderer.render(scene, camera)
         }
+
         animate()
     });
     return(
-        <React.Fragment>
-            <div className="container">
-                <Draggable bounds="html" handle=".title-bar" >
-                    <div className="info-container">
-                        <div className="window" >
-                            <div className="title-bar">
-                                <div className="title-bar-text">About wildrun0</div>
-                                <div className="title-bar-controls">
-                                    <button aria-label="Minimize"></button>
-                                    <button aria-label="Maximize"></button>
-                                    <button aria-label="Close"></button>
-                                </div>
-                            </div>
-                            <div className="window-body">
-                                <div className="about-grid">
-                                    <img src={me} alt="I am"></img>
-                                    <div className='about-main'>
-                                        <blockquote>
-                                            very good man i really appreciate him id like to fuck him
-                                        </blockquote>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="status-bar">
-                                <p className="status-bar-field">
-                                    <MediaButton href="https://vk.com/wildrun0" SOCIAL_LOGO_NAME={vk_logo} text="VK"></MediaButton>
-                                </p>
-                                <p className="status-bar-field">
-                                    <MediaButton href="https://instagram.com/wildrun0" SOCIAL_LOGO_NAME={inst_logo} text="INSTAGRAM"></MediaButton>
-                                </p>
-                            </div>
-                        </div>
+        <div className="container">
+            <WindowsDiv title="About wildrun0" className="info-container" drag={true}>  
+                <div className="about-grid">
+                    <img src={me} alt="I am"></img>
+                    <div className='about-main'>
+                        <blockquote>
+                            very good man i really appreciate him id like to fuck him
+                        </blockquote>
                     </div>
-                </Draggable>
-                <WindowsDiv title="3D MODEL" className="model-container" drag={true}>
-                    <canvas id="bg"></canvas>
-                </WindowsDiv>
-            </div>
-        </React.Fragment>
+                </div>
+                <div className="buttons-group">
+                    <p className="status-bar-field">
+                        <MediaButton href="https://vk.com/wildrun0" SOCIAL_LOGO_NAME={vk_logo} text="VK"></MediaButton>
+                    </p>
+                    <p className="status-bar-field">
+                        <MediaButton href="https://instagram.com/wildrun0" SOCIAL_LOGO_NAME={inst_logo} text="INSTAGRAM"></MediaButton>
+                    </p>
+                </div>
+            </WindowsDiv>
+            <WindowsDiv title="3D MODEL" className="model-container" drag={true}>
+                <canvas id="bg" />
+            </WindowsDiv>
+        </div>
     )
 }
 export default Main

@@ -19,7 +19,10 @@ const WindowsDiv = props => {
                         </div>
                     </div>
                     <div className="window-body">
-                        { props.children }
+                        { React.Children.count(props.children) === 1 ? props.children : props.children[0] }
+                    </div>
+                    <div className="status-bar">
+                        { props.children[1] }
                     </div>
                 </div>
             </div>

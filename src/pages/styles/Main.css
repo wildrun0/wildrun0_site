@@ -36,3 +36,7 @@ blockquote {
     grid-gap: 15px;
     justify-content: center;
 }
+
+.buttons-group {
+    display: flex;
+}
