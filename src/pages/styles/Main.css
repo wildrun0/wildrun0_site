@@ -1,14 +1,42 @@
+:root{ --image-width: 330px; }
 body{
     background-color: #a3a3a3
 }
 #bg{
     cursor:grab;
 }
-.info-container{
-    width:650px;
+@media (max-width:500px){
+    .about-grid img{
+        width: 200px;
+    }
+    .about-main h4{
+        width: fit-content !important;
+        font-size:12px !important;
+    }
+    .about-grid{
+        grid-gap:5px !important;
+    }
+    .info-container{
+        width:100%;
+    }
+    .container{
+        display: inline-block;
+    }
 }
-.about-grid img{
-    height: 400px;
+@media (min-width:501px) {
+    .info-container{
+        width:650px;
+    }
+    .container {
+        display: grid;
+        grid-template-columns: 0fr 0fr;
+        grid-gap: 15px;
+        justify-content: center;
+    }
+    .about-grid img{
+        width: --image-width;
+        height: 400px;
+    }
 }
 .about-grid{
     display: grid;
@@ -16,7 +44,7 @@ body{
     grid-gap:10px;
 }
 blockquote {
-    margin: 0 0 20px;
+    margin:0 auto;
     padding: 20px;
     background: #dfdfdf;
 }
@@ -27,16 +55,40 @@ blockquote {
     background:silver;
 }
 .model-container{
-    width: fit-content;
+    width: 375px;
     height: fit-content;
 }
-.container {
-    display: grid;
-    grid-template-columns: 0fr 0fr;
-    grid-gap: 15px;
-    justify-content: center;
-}
-
 .buttons-group {
     display: flex;
+    margin-left:5px;
+    width: --image-width;
+}
+
+.about-main h4 {
+    margin: 0 auto;
+    width: max-content;
+    font-size: 15px;
+
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;   
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    -khtml-user-select: none;
+}
+
+@import url('http://fonts.cdnfonts.com/css/w95fa');
+.about-main p {
+    font-size: 13px;
+    font-family: "W95FA", sans-serif;
+    cursor: default;
+
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;   
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    -khtml-user-select: none;
 }

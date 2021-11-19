@@ -43,8 +43,8 @@ const Main = () => {
             const alex = gltf.scene.children[0]
             model = alex
 
-            alex.scale.set(7,7,7)
-            alex.position.set(0,-20,0)
+            model.scale.set(7,7,7)
+            model.position.set(0,-20,0)
 
             scene.add(gltf.scene);
             renderer.render(scene, camera);
@@ -68,7 +68,11 @@ const Main = () => {
                     <img src={me} alt="I am"></img>
                     <div className='about-main'>
                         <blockquote>
-                            very good man i really appreciate him id like to fuck him
+                            <h4>Alexander "wildrun0" Postnikov</h4>
+                            <p> This page exist just for fun and some tech things.</p>
+                            <p> About myself: I'm 19yo, from Russia. Currently study for <b>computer networks</b> specialty.</p>
+                            <p> I like to programm but not this much. Just some react apps and python stuff.</p>
+                            <p> My Github Profile you can check <a href="https://github.com/wildrun0">here</a></p>
                         </blockquote>
                     </div>
                 </div>
