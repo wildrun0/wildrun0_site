@@ -24,14 +24,16 @@ const Files = () => {
         return <div>Ошибка: {error.message}</div>;
     } else if (!isLoaded) {
         return <div>Загрузка...</div>;
-    } else {
+    } else {        
         return (
             <ul>
-                {items.map(item => (
-                    <li>
-                        <a href={item[1]}>{item[0]}</a>   
-                    </li>
-                ))}
+                {
+                    Object.keys(items).map((key) => (
+                        <li>
+                            <a href={api_addr + "/file/" + items[key]}> {items[key]}</a>
+                        </li>
+                    ))
+                }
             </ul>
         );
     }

@@ -6,21 +6,26 @@ UPLOAD_FOLDER = '.'
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+def tree_dir(startpath):
+    paths = []
+    for root, _, files in os.walk(startpath):
+        folder = root.replace("\\", '/') #FUKCING WINDOWZ!!!!!!
+        for file in files:
+            paths.append(f"{folder}/{file}")
+    return paths
+
 @app.route("/files", methods=["GET"])
 def list_files():
-    file_list = []
-    files = os.listdir(app.config["UPLOAD_FOLDER"])
-    for file in files:
-        # в теории можно сделать byteArray на второй аргумент чтобы через blob скачивать
-        file_list.append((file, "http://localhost:1337/file/"+file))
-        
-    response = jsonify(file_list)
+    files = tree_dir(app.config['UPLOAD_FOLDER'])
+    
+    response = jsonify(files)
     response.headers.add('Access-Control-Allow-Origin', "*") #в будущем заменить на https://wildrun0.dev
     
-    return response    
-@app.route('/file/<filename>')
-def send_file(filename):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], filename, as_attachment=True)
+    return response
+
+@app.route('/file/<path:file>')
+def send_file(file):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(host="localhost", port=1337, debug=True)
