@@ -24,17 +24,17 @@ const Files = () => {
         return <div>Ошибка: {error.message}</div>;
     } else if (!isLoaded) {
         return <div>Загрузка...</div>;
-    } else {        
+    } else {
+        console.log(items)
         return (
             <ul>
-                {
-                    Object.keys(items).map((key) => (
-                        <li>
-                            <a href={api_addr + "/file/" + items[key]}> {items[key]}</a>
-                        </li>
-                    ))
-                }
-            </ul>
+            {items.map(item => (
+                <li key={item[0]}>
+                    {/* корень    папки в корне  файлы в корне (array)*/}
+                    {  item[0]} / {item[1]}    / {item[2]}
+                </li>
+            ))}
+        </ul>
         );
     }
 }

@@ -1,18 +1,18 @@
-import os
+import os, sys
 from flask import Flask, send_from_directory, jsonify
 
-UPLOAD_FOLDER = '.'
+UPLOAD_FOLDER = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def tree_dir(startpath):
     paths = []
-    for root, _, files in os.walk(startpath):
-        folder = root.replace("\\", '/') #FUKCING WINDOWZ!!!!!!
-        for file in files:
-            paths.append(f"{folder}/{file}")
+    for root, dirs, files in os.walk(startpath):
+        _root = root.split("\\")[-1]
+        paths.append((_root, dirs, files))
     return paths
+import os
 
 @app.route("/files", methods=["GET"])
 def list_files():
