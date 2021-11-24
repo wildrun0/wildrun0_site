@@ -1,11 +1,30 @@
 :root{ --image-width: 330px; }
 body{
-    background-color: #a3a3a3
+    background-color: #a3a3a3;
 }
 #bg{
     cursor:grab;
 }
+.error{
+    width: 350px;
+    margin: auto;
+}
+.loading {
+    text-align: center;
+    font-size: 15px;
+}
+.loading-error-body {
+    display: flex;
+    height: 30px;
+}
+.loading-error-body p{
+    margin:auto;
+    width:fit-content;
+}
 @media (max-width:500px){
+    body{
+        height:100vh;
+    }
     .about-grid img{
         width: 200px;
     }

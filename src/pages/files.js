@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react'
+import WindowsDiv from '../components/WindowsDiv';
+import errorPng from '../icons/error.png'
 
 var api_addr = "http://localhost:1337";
 
@@ -21,11 +23,18 @@ const Files = () => {
         )
     }, [])
     if (error) {
-        return <div>Ошибка: {error.message}</div>;
+        return(
+            <WindowsDiv title="ERROR"className="error" drag={false}>
+                <div className="loading-error-body">
+                    <img src={errorPng} alt="Error"></img>
+                    <p>Error happend: {error.message}</p>
+                </div>
+            </WindowsDiv>
+        )
     } else if (!isLoaded) {
-        return <div>Загрузка...</div>;
+        return <p className="loading">Загрузка...</p>;
     } else {
-        console.log(items)
+        // console.log(items)
         return (
             <ul>
             {items.map(item => (

@@ -1,6 +1,11 @@
 import React from 'react';
 import Draggable from 'react-draggable';
 
+// для совместимости кнопок с touch-девайсами
+document.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    e.target.click();
+})
 function handleClose(div){
     document.getElementsByClassName(div)[0].style.visibility = "hidden";
 }
@@ -27,7 +32,7 @@ const WindowsDiv = props => {
                 <div className="window">
                     <div className="title-bar">
                         <div className="title-bar-text">{props.title}</div>
-                        <div className="title-bar-controls">
+                        <div className="title-bar-controls" style={{display: props.enableControls ? "":"none"}}>
                             <button aria-label="Minimize" onClick={() => handleMinimize(props.className)}></button>
                             <button aria-label="Maximize" onClick={() => handleMaximize(props.className)}></button>
                             <button aria-label="Close" onClick={() => handleClose(props.className)}></button>

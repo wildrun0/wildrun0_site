@@ -63,7 +63,7 @@ const Main = () => {
     });
     return(
         <div className="container">
-            <WindowsDiv title="About wildrun0" className="info-container" drag={true}>  
+            <WindowsDiv title="About wildrun0" className="info-container" drag={true} enableControls={true}>  
                 <div className="about-grid">
                     <img src={me} alt="I am"></img>
                     <div className='about-main'>
@@ -85,7 +85,7 @@ const Main = () => {
                     </p>
                 </div>
             </WindowsDiv>
-            <WindowsDiv title="3D MODEL" className="model-container" drag={true}>
+            <WindowsDiv title="3D MODEL" className="model-container" drag={true} enableControls={true}>
                 <canvas id="bg" />
             </WindowsDiv>
         </div>
