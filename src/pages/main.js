@@ -61,15 +61,6 @@ const Main = () => {
 
         animate()
     });
-    const iconAuthorStyle = {
-        opacity: 0.5, 
-        width: "fit-content", 
-        zIndex: -1,
-        position: "absolute",
-        bottom: 0,
-        textAlign: "center",
-        width: '100%'
-    };
     return(
         <div className="container">
             <WindowsDiv title="About wildrun0" className="info-container" drag={true} enableControls={true}>  
