@@ -5,6 +5,14 @@ body{
 #bg{
     cursor:grab;
 }
+.iconAuthorStyle{
+    opacity: 0.5;
+    width: fit-content;
+    z-index: -1;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
 .error{
     width: 350px;
     margin: auto;
@@ -22,6 +30,9 @@ body{
     width:fit-content;
 }
 @media (max-width:500px){
+    .iconAuthorStyle{
+        bottom: -200px;
+    }
     body{
         height:100vh;
     }
@@ -43,6 +54,9 @@ body{
     }
 }
 @media (min-width:501px) {
+    .iconAuthorStyle{
+        bottom:0;
+    }
     .info-container{
         width:650px;
     }

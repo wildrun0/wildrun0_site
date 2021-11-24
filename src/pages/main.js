@@ -61,6 +61,15 @@ const Main = () => {
 
         animate()
     });
+    const iconAuthorStyle = {
+        opacity: 0.5, 
+        width: "fit-content", 
+        zIndex: -1,
+        position: "absolute",
+        bottom: 0,
+        textAlign: "center",
+        width: '100%'
+    };
     return(
         <div className="container">
             <WindowsDiv title="About wildrun0" className="info-container" drag={true} enableControls={true}>  
@@ -88,7 +97,7 @@ const Main = () => {
             <WindowsDiv title="3D MODEL" className="model-container" drag={true} enableControls={true}>
                 <canvas id="bg" />
             </WindowsDiv>
-        </div>
+            <div className="iconAuthorStyle">Icon made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>        </div>
     )
 }
 export default Main

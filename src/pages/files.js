@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useReducer, fetchData} from 'react'
+import React, {useEffect, useState, useReducer} from 'react'
 import WindowsDiv from '../components/WindowsDiv';
 import errorPng from '../icons/error.png'
 
@@ -93,7 +93,6 @@ const Files = () => {
             )
         )
     }
-
     if (error) {
         return(
             <WindowsDiv title="ERROR"className="error" drag={false}>
@@ -110,7 +109,6 @@ const Files = () => {
                 <React.Fragment>
                     {listFiles(items)}
                 </React.Fragment>
-            // <div dangerouslySetInnerHTML={{__html: _listFiles(items).innerHTML}} />
         );
     }
 }

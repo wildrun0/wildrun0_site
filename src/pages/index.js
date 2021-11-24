@@ -8,9 +8,6 @@ import Main from './main'
 import Files from './files'
 
 const Pages = () => {
-    useEffect(() => {
-        document.title = "wildrun0 home"
-    });
     return(
         <BrowserRouter>
             <Layout>
