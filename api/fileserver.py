@@ -9,11 +9,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def tree_dir(startpath):
     paths = []
     for root, dirs, files in os.walk(startpath):
-        _root = root.split("\\")[-1]
+        _root = root.split("api")[1]
         paths.append((_root, dirs, files))
+        print(_root)
     return paths
-import os
-
 @app.route("/files", methods=["GET"])
 def list_files():
     files = tree_dir(app.config['UPLOAD_FOLDER'])
