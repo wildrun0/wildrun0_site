@@ -80,7 +80,7 @@ const Files = () => {
                             elems.push(
                                 React.createElement("li", {Key: i}, 
                                     React.createElement("a", {
-                                        href: api_addr+"/file/"+element[0]+'/'+file, 
+                                        href: api_addr+element[0]+'/'+file, 
                                         download: ''
                                     }, file)
                                 )

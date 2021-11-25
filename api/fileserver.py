@@ -1,7 +1,7 @@
 import os, sys
 from flask import Flask, send_from_directory, jsonify
 
-UPLOAD_FOLDER = os.path.abspath(os.path.dirname(sys.argv[0]))
+UPLOAD_FOLDER = os.path.abspath(os.path.dirname(sys.argv[0]))+"/files/"
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -22,7 +22,7 @@ def list_files():
     
     return response
 
-@app.route('/file/<path:file>', methods=["GET"])
+@app.route('/files/<path:file>', methods=["GET"])
 def send_file(file):
     return send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True)
 
