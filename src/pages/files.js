@@ -36,7 +36,6 @@ const Files = () => {
         e.preventDefault(); // двойной клик заебал
     }
     useEffect(() => {
-        // document.addEventListener("click", update, false);
         fetch(`${api_addr}/files`)
         .then(res => res.json())
         .then(
@@ -106,9 +105,9 @@ const Files = () => {
         return <p className="loading">Загрузка...</p>;
     } else {
         return (
-                <React.Fragment>
-                    {listFiles(items)}
-                </React.Fragment>
+            <React.Fragment>
+                {listFiles(items)}
+            </React.Fragment>
         );
     }
 }

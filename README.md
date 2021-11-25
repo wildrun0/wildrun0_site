@@ -1,3 +1,2 @@
 # WIP wildrun0.dev
-#
-# Website source code
+Website source code

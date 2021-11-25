@@ -22,7 +22,7 @@ def list_files():
     
     return response
 
-@app.route('/file/<path:file>')
+@app.route('/file/<path:file>', methods=["GET"])
 def send_file(file):
     return send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True)
 
