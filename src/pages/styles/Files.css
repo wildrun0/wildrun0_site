@@ -1,21 +1,33 @@
 :root{
     --div-height: 450px;
 }
-.pathDiv{
+.fileManagerDiv .window-body{
+    margin:0;
+}
+.pathDiv {
     display: flex;
+    flex: 1 1;
+    background-color: white;
+    height: 22px;
 }
 .pathDiv p {
     width: 100%;
     height: 12px;
     overflow: scroll;
-    white-space: nowrap;
 }
 .pathDiv p::-webkit-scrollbar{
     display: none;
 }
-.pathDiv img{
-    width:28px;
-    height: fit-content;
+.title-path{
+    margin-top:5px;
+    display: flex;
+    height: 25px;
+}
+.title-path button {
+    margin: auto;
+    margin-right: 1px;
+    text-shadow: none;
+    color: black;
 }
 .filesList{
     margin-left: 20px;
@@ -36,10 +48,10 @@
 .fileListElement {
     display: flex;
     float: left;
+    color: black;
 }
 .fileListElement img{
     width: 22px;
-    height: 20px;
     margin: auto;
     margin-right:2px;
 }
@@ -79,7 +91,7 @@
         max-height: calc(var(--div-height) - 75px);
     }
     .pathDiv p {
-        margin: 13px 5px 0px;
+        margin: 7px 2px 0px;
     }
 }
 @media (max-width:500px){
@@ -93,6 +105,6 @@
         max-height: calc(var(--div-height) - 195px);
     }
     .pathDiv p {
-        margin: 16px 5px 0px;
+        margin: 5px 5px 0px;
     }
 }

@@ -6,8 +6,19 @@ import './styles/Files.css'
 import errorPng from '../icons/error.png'
 import directoryPng from '../icons/directory.png'
 import directoryBackPng from "../icons/directoryBack.png"
-import defaultFilePng from "../icons/defaultFile.png"
 import pathIcon from "../icons/pathIcon.png"
+
+import txtFilePng from "../icons/txtFile.png"
+import zipFilePng from "../icons/zipFile.png"
+import defaultFilePng from "../icons/pyFile.png"
+var filesIcons = {
+    'unknown': defaultFilePng,
+    'txt': txtFilePng,
+    //несколько ключей к одному значению
+    ...Object.fromEntries(
+        ['7z','zip', 'rar'].map(key => [key, zipFilePng])
+    )
+}
 
 var api_addr = "http://192.168.0.101:1337";
 
@@ -23,8 +34,9 @@ const Files = () => {
     function update(e, key, path){
         e.preventDefault(); // двойной клик заебал
         var element_index = parseInt(key)
+
         if (path !== undefined){
-            current_path = path.replace("//", '/')
+            current_path = path.replace(/\\/g, "/")
         }
         //  магия по переключению папок
         // "глубина папок" = current_direction. Каждая папка = +1 к current_direction.
@@ -65,7 +77,12 @@ const Files = () => {
           }
         )
     }, [])
-
+    function setFileIcon(fileName){
+        var re = /(?:\.([^.]+))?$/;
+        var fileExt = re.exec(fileName)[1];
+        return fileExt in filesIcons ? filesIcons[fileExt]:filesIcons['unknown'];
+        
+    }
     function listFiles(arr){
         // собираю все в массив т.к. по нормальному оно работать не хочет (или я не придумал как сделать нормально....)
         var elems = [];
@@ -97,7 +114,7 @@ const Files = () => {
                                     React.createElement("a", {
                                         href: "#",
                                         className: "fileListElement",
-                                        onClick: (e) => update(e, i, String(element[0].replace('\\','/')+"/"+folder).replace("\\", '/'))
+                                        onClick: (e) => update(e, i, String(element[0]+"/"+folder))
                                     }, React.createElement("img", {
                                         src: directoryPng
                                     }),
@@ -115,7 +132,7 @@ const Files = () => {
                                         download: '',
                                         className: "fileListElement"
                                     }, React.createElement("img", {
-                                        src: defaultFilePng,
+                                        src: setFileIcon(file),
                                     }),
                                     React.createElement("p", {}, file)
                                     )
@@ -144,10 +161,14 @@ const Files = () => {
         return (
             <WindowsDiv title="File Manager" className="fileManagerDiv" enableControls={true}>
                 <div>
-                    <div className="pathDiv">
-                        <img alt="path icon" src={pathIcon}></img>
-                        <p>{current_path}</p>
+                    <div className="title-path">
+                        <button type="button" disabled>Address</button>
+                        <div className="pathDiv">
+                            <img alt="path icon" src={pathIcon}></img>
+                            <p>{current_path}</p>
+                        </div>
                     </div>
+                    <hr></hr>
                     {listFiles(items)}
                 </div>
             </WindowsDiv>
