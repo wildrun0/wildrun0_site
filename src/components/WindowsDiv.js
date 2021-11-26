@@ -24,18 +24,22 @@ function handleClose(div){
 }
 function handleMinimize(div){
     var div_element = document.getElementsByClassName(div)[0]
+    var status_bar = div_element.getElementsByClassName("status-bar")[0]
+
     div_element.getElementsByClassName("window-body")[0].style.display = "none";
 
-    if (div_element.getElementsByClassName("status-bar")[0].hasChildNodes()){
-        div_element.getElementsByClassName("status-bar")[0].style.display = "none";
+    if (status_bar.hasChildNodes()){
+        status_bar.style.display = "none";
     }
 }
 function handleMaximize(div){
     var div_element = document.getElementsByClassName(div)[0]
+    var status_bar = div_element.getElementsByClassName("status-bar")[0]
+
     div_element.getElementsByClassName("window-body")[0].style.display = "";
 
-    if (div_element.getElementsByClassName("status-bar")[0].hasChildNodes()){
-        div_element.getElementsByClassName("status-bar")[0].style.display = "";
+    if (status_bar.hasChildNodes()){
+        status_bar.style.display = "";
     }
 }
 const WindowsDiv = props => {

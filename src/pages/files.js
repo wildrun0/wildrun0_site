@@ -25,7 +25,7 @@ var api_addr = "http://192.168.0.101:1337";
 var dirs_history = [];
 var current_direction = 0;
 var current_path = "/files";
-
+ 
 const Files = () => {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -34,9 +34,14 @@ const Files = () => {
     function update(e, key, path){
         e.preventDefault(); // двойной клик заебал
         var element_index = parseInt(key)
-
+        
         if (path !== undefined){
-            current_path = path.replace(/\\/g, "/")
+            current_path = path
+            var path_el = document.getElementsByClassName("pathText")[0]
+            //работает только так
+            setTimeout(function(){
+                path_el.scrollLeft = 1500;    
+            },1);
         }
         //  магия по переключению папок
         // "глубина папок" = current_direction. Каждая папка = +1 к current_direction.
@@ -106,35 +111,70 @@ const Files = () => {
                     if (index === current_direction){
                         var folders = element[1];
                         var files = element[2];
-                
                         folders.forEach((folder, i) =>{
+                            var folderName = folder[0];
+                            var folderModifDate = folder[1];
+                            var folderSize = folder[2];
+
                             i++; // ну не нада мне с 0 считать, не нада
                             elems.push(
-                                React.createElement("li", {Key: i}, 
+                                React.createElement("li", {
+                                        Key: i,
+                                        className: "fileLiElement"
+                                    }, 
                                     React.createElement("a", {
-                                        href: "#",
-                                        className: "fileListElement",
-                                        onClick: (e) => update(e, i, String(element[0]+"/"+folder))
-                                    }, React.createElement("img", {
-                                        src: directoryPng
-                                    }),
-                                    React.createElement("p", {}, folder)
+                                            href: "#",
+                                            className: "fileListElement",
+                                            onClick: (e) => update(e, i, String(element[0]+"/"+folderName))
+                                        }, 
+                                        React.createElement("img", {
+                                            src: directoryPng
+                                        }),
+                                        React.createElement("p", {}, folderName)
+                                    ),
+                                    React.createElement("p",{
+                                        className: "fileCreateDate"
+                                    },
+                                        folderModifDate
+                                    ),
+                                    React.createElement("p",{
+                                        className: "fileSize"
+                                    },
+                                        folderSize
                                     )
                                 )
                             )
                         });
                         files.forEach((file, i) =>{
+                            var fileName = file[0];
+                            var fileModifDate = file[1];
+                            var fileSize = file[2];
+
                             i = i+1337; // чтобы key папок и файлов отличались
                             elems.push(
-                                React.createElement("li", {Key: i}, 
+                                React.createElement("li", {
+                                        Key: i,
+                                        className: "fileLiElement"
+                                    }, 
                                     React.createElement("a", {
-                                        href: api_addr+element[0]+'/'+file, 
-                                        download: '',
-                                        className: "fileListElement"
-                                    }, React.createElement("img", {
-                                        src: setFileIcon(file),
-                                    }),
-                                    React.createElement("p", {}, file)
+                                            href: api_addr+element[0]+'/'+fileName, 
+                                            download: '',
+                                            className: "fileListElement"
+                                        }, 
+                                        React.createElement("img", {
+                                            src: setFileIcon(fileName)
+                                        }),
+                                        React.createElement("p", {}, fileName)
+                                    ),
+                                    React.createElement("p",{
+                                        className: "fileCreateDate"
+                                    },
+                                        fileModifDate
+                                    ),
+                                    React.createElement("p",{
+                                        className: "fileSize"
+                                    },
+                                        fileSize
                                     )
                                 )
                             )
@@ -165,7 +205,7 @@ const Files = () => {
                         <button type="button" disabled>Address</button>
                         <div className="pathDiv">
                             <img alt="path icon" src={pathIcon}></img>
-                            <p>{current_path}</p>
+                            <div className="pathText">{current_path}</div>
                         </div>
                     </div>
                     <hr></hr>
