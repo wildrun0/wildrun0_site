@@ -1,7 +1,6 @@
 :root{
     --div-height: 450px;
 }
-
 .filesList{
     max-height: calc(var(--div-height) - 35px);
     overflow-y:auto;
@@ -40,12 +39,12 @@
     font-size: 15px;
 }
 .loading-error-body {
-    display: flex;
-    height: 30px;
+    display: grid;
+    height: 50px;
+    grid-template-columns: 30px 1fr;
 }
 .loading-error-body p{
-    margin:auto;
-    width:fit-content;
+    margin: auto 10px auto;
 }
 .fileManagerDiv{
     width: 550px;
