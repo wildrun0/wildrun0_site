@@ -5,7 +5,7 @@ import Draggable from 'react-draggable';
 // touchend вместо touchstart чтобы отрабатывать точнее
 var touchmove;
 document.addEventListener('touchend', (e) => {
-    if (touchmove != true){
+    if (touchmove !== true){
         e.preventDefault();
         e.target.click();
     }

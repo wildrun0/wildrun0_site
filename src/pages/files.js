@@ -7,20 +7,25 @@ import errorPng from '../icons/error.png'
 import directoryPng from '../icons/directory.png'
 import directoryBackPng from "../icons/directoryBack.png"
 import defaultFilePng from "../icons/defaultFile.png"
+import pathIcon from "../icons/pathIcon.png"
 
 var api_addr = "http://192.168.0.101:1337";
 
 var dirs_history = [];
 var current_direction = 0;
+var current_path = "/files";
 
 const Files = () => {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState([]);
     const [, forceUpdate] = useReducer(x => x + 1, 0);
-    function update(e, key){
+    function update(e, key, path){
+        e.preventDefault(); // двойной клик заебал
         var element_index = parseInt(key)
-
+        if (path !== undefined){
+            current_path = path.replace("//", '/')
+        }
         //  магия по переключению папок
         // "глубина папок" = current_direction. Каждая папка = +1 к current_direction.
         // element_index -1 это <li> элемент который должен вернуть нас на директорию назад
@@ -29,18 +34,22 @@ const Files = () => {
             dirs_history.pop();
             if (current_direction === undefined){
                 current_direction = 0;
+            } else{
+                var current_path_splitted = current_path.split('/')
+                current_path_splitted.pop()
+
+                current_path = current_path_splitted.join('/')
             }
         } else{
             dirs_history.push(current_direction);
             if (current_direction > 1){
                 // если мы не на начальном экране
-                current_direction = parseInt(element_index)+current_direction;
+                current_direction = element_index+current_direction;
             }else{
-                current_direction = parseInt(element_index);
+                current_direction = element_index;
             }
         }
         forceUpdate(); // обновляем чтобы отрендерить папку
-        e.preventDefault(); // двойной клик заебал
     }
     useEffect(() => {
         fetch(`${api_addr}/files`)
@@ -88,7 +97,7 @@ const Files = () => {
                                     React.createElement("a", {
                                         href: "#",
                                         className: "fileListElement",
-                                        onClick: (e) => update(e, i)
+                                        onClick: (e) => update(e, i, String(element[0].replace('\\','/')+"/"+folder).replace("\\", '/'))
                                     }, React.createElement("img", {
                                         src: directoryPng
                                     }),
@@ -134,7 +143,13 @@ const Files = () => {
     } else {
         return (
             <WindowsDiv title="File Manager" className="fileManagerDiv" enableControls={true}>
-                {listFiles(items)}
+                <div>
+                    <div className="pathDiv">
+                        <img alt="path icon" src={pathIcon}></img>
+                        <p>{current_path}</p>
+                    </div>
+                    {listFiles(items)}
+                </div>
             </WindowsDiv>
         );
     }

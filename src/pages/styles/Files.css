@@ -1,12 +1,33 @@
 :root{
     --div-height: 450px;
 }
+.pathDiv{
+    display: flex;
+}
+.pathDiv p {
+    width: 100%;
+    height: 12px;
+    overflow: scroll;
+    white-space: nowrap;
+}
+.pathDiv p::-webkit-scrollbar{
+    display: none;
+}
+.pathDiv img{
+    width:28px;
+    height: fit-content;
+}
 .filesList{
-    max-height: calc(var(--div-height) - 35px);
-    overflow-y:auto;
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     list-style-type: none;
+    padding: 0;
+}
+.fileListElement:active, .fileListElement:focus{
+    outline: none;
 }
 /* Баг в 98.css - двойная кнопка скролла */
 .filesList::-webkit-scrollbar-button{
@@ -47,9 +68,31 @@
     margin: auto 10px auto;
     /* test */
 }
-.fileManagerDiv{
-    width: 550px;
+@media (min-width:501px) {
+    .fileManagerDiv{
+        width: 550px;
+    }
+    .fileManagerDiv .window{
+        height: var(--div-height);
+    }
+    .filesList{
+        max-height: calc(var(--div-height) - 75px);
+    }
+    .pathDiv p {
+        margin: 13px 5px 0px;
+    }
 }
-.fileManagerDiv .window{
-    height: var(--div-height);
+@media (max-width:500px){
+    .fileManagerDiv{
+        width: 100%;
+    }
+    .fileManagerDiv .window{
+        height: calc(var(--div-height) - 90px);
+    }
+    .filesList{
+        max-height: calc(var(--div-height) - 195px);
+    }
+    .pathDiv p {
+        margin: 16px 5px 0px;
+    }
 }
