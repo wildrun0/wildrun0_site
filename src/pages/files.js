@@ -19,12 +19,12 @@ const Files = () => {
     const [items, setItems] = useState([]);
     const [, forceUpdate] = useReducer(x => x + 1, 0);
     function update(e, key){
-        var element_index = key
+        var element_index = parseInt(key)
 
         //  магия по переключению папок
         // "глубина папок" = current_direction. Каждая папка = +1 к current_direction.
         // element_index -1 это <li> элемент который должен вернуть нас на директорию назад
-        if (parseInt(element_index) === -1){
+        if (element_index === -1){
             current_direction = dirs_history[dirs_history.length -1];
             dirs_history.pop();
             if (current_direction === undefined){
@@ -124,12 +124,13 @@ const Files = () => {
             <WindowsDiv title="ERROR"className="error" drag={false}>
                 <div className="loading-error-body">
                     <img src={errorPng} alt="Error"></img>
-                    <p>Error happend: {error.message}</p>
+                    <p><b>Error happend: {error.message}.</b> This was probably caused because of internal server error or 
+                    server unavailability. Try to refresh the page</p>
                 </div>
             </WindowsDiv>
         )
     } else if (!isLoaded) {
-        return <p className="loading">Загрузка...</p>;
+        return <p className="loading">Loading...</p>;
     } else {
         return (
             <WindowsDiv title="File Manager" className="fileManagerDiv" enableControls={true}>
