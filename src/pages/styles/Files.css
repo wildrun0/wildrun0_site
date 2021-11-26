@@ -1,0 +1,55 @@
+:root{
+    --div-height: 450px;
+}
+
+.filesList{
+    max-height: calc(var(--div-height) - 35px);
+    overflow-y:auto;
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+}
+/* Баг в 98.css - двойная кнопка скролла */
+.filesList::-webkit-scrollbar-button{
+    display: none;
+}
+.fileListElement {
+    display: flex;
+    float: left;
+}
+.fileListElement img{
+    width: 22px;
+    height: 20px;
+    margin: auto;
+    margin-right:2px;
+}
+.iconAuthorStyle{
+    opacity: 0.5;
+    width: fit-content;
+    z-index: -1;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
+.error{
+    width: 350px;
+    margin: auto;
+}
+.loading {
+    text-align: center;
+    font-size: 15px;
+}
+.loading-error-body {
+    display: flex;
+    height: 30px;
+}
+.loading-error-body p{
+    margin:auto;
+    width:fit-content;
+}
+.fileManagerDiv{
+    width: 550px;
+}
+.fileManagerDiv .window{
+    height: var(--div-height);
+}

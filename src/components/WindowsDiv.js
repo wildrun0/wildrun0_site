@@ -1,11 +1,24 @@
 import React from 'react';
 import Draggable from 'react-draggable';
 
-// для совместимости кнопок с touch-девайсами
-document.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    e.target.click();
+// конвертирует touch-нажатия в click для совместимости
+// touchend вместо touchstart чтобы отрабатывать точнее
+var touchmove;
+document.addEventListener('touchend', (e) => {
+    if (touchmove != true){
+        e.preventDefault();
+        e.target.click();
+    }
 })
+
+//защита от клика когда свайпаешь
+document.addEventListener("touchmove", (e) =>{
+    touchmove = true;
+})
+document.addEventListener("touchstart", (e) =>{
+    touchmove = false;
+})
+
 function handleClose(div){
     document.getElementsByClassName(div)[0].style.visibility = "hidden";
 }

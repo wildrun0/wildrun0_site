@@ -1,33 +1,11 @@
-:root{ --image-width: 330px; }
+:root{ 
+    --image-width: 330px;
+}
 body{
     background-color: #a3a3a3;
 }
 #bg{
     cursor:grab;
-}
-.iconAuthorStyle{
-    opacity: 0.5;
-    width: fit-content;
-    z-index: -1;
-    position: absolute;
-    text-align: center;
-    width: 100%;
-}
-.error{
-    width: 350px;
-    margin: auto;
-}
-.loading {
-    text-align: center;
-    font-size: 15px;
-}
-.loading-error-body {
-    display: flex;
-    height: 30px;
-}
-.loading-error-body p{
-    margin:auto;
-    width:fit-content;
 }
 @media (max-width:500px){
     .iconAuthorStyle{
@@ -67,7 +45,7 @@ body{
         justify-content: center;
     }
     .about-grid img{
-        width: --image-width;
+        width: var(--image-width);
         height: 400px;
     }
 }
@@ -94,7 +72,7 @@ blockquote {
 .buttons-group {
     display: flex;
     margin-left:5px;
-    width: --image-width;
+    width: var(--image-width);
 }
 
 .about-main h4 {
