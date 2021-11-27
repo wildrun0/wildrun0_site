@@ -12,6 +12,9 @@ body{
 #bg{
     cursor:grab;
 }
+.info-container .status-bar{
+     width:335px;
+}
 @media (max-width:500px){
     .iconAuthorStyle{
         bottom: -200px;
@@ -79,7 +82,6 @@ blockquote {
     margin-left:5px;
     width: var(--image-width);
 }
-
 .about-main h4 {
     margin: 0 auto;
     width: max-content;

@@ -1,6 +1,9 @@
 :root{
     --div-height: 450px;
 }
+.container.files{
+    grid-gap:0;
+}
 @font-face {
     font-family: 'Microsoft Sans Serif';
     src: url('MicrosoftSansSerif.ttf') format('truetype');
@@ -8,7 +11,6 @@
     font-style: normal;
     font-display: swap;
 }
-
 .fileManagerDiv .window-body{
     margin:0;
 }
@@ -70,13 +72,13 @@
     color: black;
 }
 .fileLiElement {
+    font-size:12px;
     display: grid;
     grid-template-columns: 2fr 1fr 0fr;
 }
 .fileListElement img{
-    width: 22px;
     margin: auto;
-    margin-right:2px;
+    margin-right:3px;
 }
 .fileListElement p{
     text-overflow: ellipsis;
@@ -111,7 +113,7 @@
 }
 @media (min-width:501px) {
     .fileListElement img{
-        width: 22px;
+        width: 28px;
     }
     .fileManagerDiv{
         width: 550px;
@@ -127,14 +129,17 @@
     }
 }
 @media (max-width:500px){
+    .container.files{
+        display: flex;
+    }
     .fileManagerDiv{
         width: 100%;
     }
     .fileManagerDiv .window-body{
-        height: calc(100vh - 300px);
+        height: 100%;
     }
     .filesList{
-        max-height: calc(100vh - 360px);
+        height: 360px;
     }
     .fileListElement p{
         width: 150px;

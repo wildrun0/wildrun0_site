@@ -12,7 +12,8 @@ body{
     display: grid;
     grid-template-columns: minmax(50px, auto) 1fr;
     height:55px;
-    background-color: rgb(0, 128,128);
+    background: linear-gradient(270deg,rgb(0, 128,128),rgb(0 171 171))
+    /* background-color: rgb(0, 128,128); */
 }
 .logotext{
     display: grid;
@@ -21,12 +22,19 @@ body{
     font-size: 15px;
     font-weight: bold;
 }
+.logotext a{ 
+    outline: none; 
+    border:none; 
+}
 .buttons{
     display: grid;
     grid-template-columns: repeat(3, 100px);
     grid-gap:5px;
     text-align: center;
     align-items: center;
+}
+.buttons button:focus{
+    outline: none;
 }
 .navbar-container-main button{
     width:100%;

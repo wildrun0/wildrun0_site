@@ -10,13 +10,21 @@ import pathIcon from "../icons/pathIcon.png"
 
 import txtFilePng from "../icons/txtFile.png"
 import zipFilePng from "../icons/zipFile.png"
-import defaultFilePng from "../icons/pyFile.png"
+import defaultFilePng from "../icons/defaultFile.png"
+import musicFilePng from '../icons/musicFile.png'
+import videoFilePng from "../icons/videoFile.png"
 var filesIcons = {
     'unknown': defaultFilePng,
     'txt': txtFilePng,
     //несколько ключей к одному значению
     ...Object.fromEntries(
         ['7z','zip', 'rar'].map(key => [key, zipFilePng])
+    ),
+    ...Object.fromEntries(
+        ['mp3','wav', 'ogg', 'flac'].map(key => [key, musicFilePng])
+    ),
+    ...Object.fromEntries(
+        ['mp4','mkv', 'avi'].map(key => [key, videoFilePng])
     )
 }
 
@@ -103,7 +111,7 @@ const Files = () => {
                     )
                 ),
                 arr.forEach((element) =>{
-                    var path = element[0]
+                    var path = element[0];
                     if (path === current_path){
                         var folders = element[1];
                         var files = element[2];
@@ -181,7 +189,7 @@ const Files = () => {
     }
     if (error) {
         return(
-            <WindowsDiv title="ERROR"className="error" drag={false}>
+            <WindowsDiv title="ERROR" className="error" drag={false}>
                 <div className="loading-error-body">
                     <img src={errorPng} alt="Error"></img>
                     <p><b>Error happend: {error.message}.</b> This was probably caused because of internal server error or 
@@ -193,19 +201,21 @@ const Files = () => {
         return <p className="loading">Loading...</p>;
     } else {
         return (
-            <WindowsDiv title="File Manager" className="fileManagerDiv" enableControls={true}>
-                <div>
-                    <div className="title-path">
-                        <button type="button" disabled>Address</button>
-                        <div className="pathDiv">
-                            <img alt="path icon" src={pathIcon}></img>
-                            <div className="pathText">{current_path}</div>
+            <div className="container files">
+                <WindowsDiv title="File Manager" className="fileManagerDiv" enableControls={true}>
+                    <div>
+                        <div className="title-path">
+                            <button type="button" disabled>Address</button>
+                            <div className="pathDiv">
+                                <img alt="path icon" src={pathIcon}></img>
+                                <div className="pathText">{current_path}</div>
+                            </div>
                         </div>
+                        <hr></hr>
+                        {listFiles(items)}
                     </div>
-                    <hr></hr>
-                    {listFiles(items)}
-                </div>
-            </WindowsDiv>
+                </WindowsDiv>
+            </div>
         );
     }
 }
