@@ -43,9 +43,8 @@ const Files = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState([]);
     const [, forceUpdate] = useReducer(x => x + 1, 0);
-    function update(e, key, path){
+    function update(e, path){
         e.preventDefault(); // двойной клик заебал
-        var element_index = parseInt(key)
 
         if (path !== undefined){
             current_path = path
@@ -54,7 +53,7 @@ const Files = () => {
             setTimeout(function(){
                 path_el.scrollLeft = 1500;    
             },1);
-        } else if (element_index === -1){
+        } else{
             if (current_path !== '/files'){
                 var current_path_arrayed = current_path.split('/')
                 current_path_arrayed.pop()
@@ -81,25 +80,26 @@ const Files = () => {
         var re = /(?:\.([^.]+))?$/;
         var fileExt = re.exec(fileName)[1];
         return fileExt in filesIcons ? filesIcons[fileExt]:filesIcons['unknown'];
-        
     }
     function listFiles(arr){
         // собираю все в массив т.к. по нормальному оно работать не хочет (или я не придумал как сделать нормально....)
         var elems = [];
         return(
-            React.createElement("ul",
-                {
-                    className: "filesList"
-                },
+            React.createElement("ul", {
+                        className: "filesList"
+                    },
                 React.createElement("li", {
-                    key: -1
-                }, React.createElement("a", {
-                        href: "#", onClick: (e) => update(e, -1),
-                        className: "fileListElement"
-                        }, React.createElement("img", {
-                            src: directoryBackPng
-                        }),
-                            React.createElement("p", {}, "../")
+                        key: -1
+                    }, 
+                    React.createElement("a", {
+                            href: "#", onClick: (e) => update(e),
+                            className: "fileListElement"
+                        },
+                        React.createElement("img", {
+                                src: directoryBackPng
+                            }
+                        ),
+                        React.createElement("p", {}, "../")
                     )
                 ),
                 arr.forEach((element) =>{
@@ -107,20 +107,20 @@ const Files = () => {
                     if (path === current_path){
                         var folders = element[1];
                         var files = element[2];
-                        folders.forEach((folder, i) =>{
+                        folders.forEach((folder) =>{
                             var folderName = folder[0];
                             var folderModifDate = folder[1];
                             var folderSize = folder[2];
-
+                            var folderUniqHash = folderModifDate.hashCode()+folderName.hashCode()+folderSize.hashCode()
                             elems.push(
                                 React.createElement("li", {
-                                        key: folderModifDate.hashCode()+folderName.hashCode()+folderSize.hashCode(),
+                                        key: folderUniqHash,
                                         className: "fileLiElement"
                                     }, 
                                     React.createElement("a", {
                                             href: "#",
                                             className: "fileListElement",
-                                            onClick: (e) => update(e, i, element[0]+"/"+folderName)
+                                            onClick: (e) => update(e, element[0]+"/"+folderName)
                                         }, 
                                         React.createElement("img", {
                                             src: directoryPng
@@ -128,13 +128,13 @@ const Files = () => {
                                         React.createElement("p", {}, folderName)
                                     ),
                                     React.createElement("p",{
-                                        className: "fileCreateDate"
-                                    },
+                                            className: "fileCreateDate"
+                                        },
                                         folderModifDate
                                     ),
                                     React.createElement("p",{
-                                        className: "fileSize"
-                                    },
+                                            className: "fileSize"
+                                        },
                                         folderSize
                                     )
                                 )
@@ -144,10 +144,10 @@ const Files = () => {
                             var fileName = file[0];
                             var fileModifDate = file[1];
                             var fileSize = file[2];
-
+                            var fileUniqHash = fileModifDate.hashCode()+fileName.hashCode()+fileSize.hashCode()
                             elems.push(
                                 React.createElement("li", {
-                                        key: fileModifDate.hashCode()+fileName.hashCode()+fileSize.hashCode(),
+                                        key: fileUniqHash,
                                         className: "fileLiElement"
                                     }, 
                                     React.createElement("a", {
@@ -161,13 +161,13 @@ const Files = () => {
                                         React.createElement("p", {}, fileName)
                                     ),
                                     React.createElement("p",{
-                                        className: "fileCreateDate"
-                                    },
+                                            className: "fileCreateDate"
+                                        },
                                         fileModifDate
                                     ),
                                     React.createElement("p",{
-                                        className: "fileSize"
-                                    },
+                                            className: "fileSize"
+                                        },
                                         fileSize
                                     )
                                 )
