@@ -22,10 +22,22 @@ var filesIcons = {
 
 var api_addr = "http://192.168.0.101:1337";
 
-var dirs_history = [];
-var current_direction = 0;
 var current_path = "/files";
- 
+
+// Чтобы создать уникальные key для каждого <li> элемента
+// Ниже отключаем чтобы реакт не ругался на изменение String элемента
+// eslint-disable-next-line
+String.prototype.hashCode = function() {
+    var hash = 0, i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+      chr   = this.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+};
+
 const Files = () => {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -34,7 +46,7 @@ const Files = () => {
     function update(e, key, path){
         e.preventDefault(); // двойной клик заебал
         var element_index = parseInt(key)
-        
+
         if (path !== undefined){
             current_path = path
             var path_el = document.getElementsByClassName("pathText")[0]
@@ -42,28 +54,11 @@ const Files = () => {
             setTimeout(function(){
                 path_el.scrollLeft = 1500;    
             },1);
-        }
-        //  магия по переключению папок
-        // "глубина папок" = current_direction. Каждая папка = +1 к current_direction.
-        // element_index -1 это <li> элемент который должен вернуть нас на директорию назад
-        if (element_index === -1){
-            current_direction = dirs_history[dirs_history.length -1];
-            dirs_history.pop();
-            if (current_direction === undefined){
-                current_direction = 0;
-            } else{
-                var current_path_splitted = current_path.split('/')
-                current_path_splitted.pop()
-
-                current_path = current_path_splitted.join('/')
-            }
-        } else{
-            dirs_history.push(current_direction);
-            if (current_direction > 1){
-                // если мы не на начальном экране
-                current_direction = element_index+current_direction;
-            }else{
-                current_direction = element_index;
+        } else if (element_index === -1){
+            if (current_path !== '/files'){
+                var current_path_arrayed = current_path.split('/')
+                current_path_arrayed.pop()
+                current_path = current_path_arrayed.join("/")
             }
         }
         forceUpdate(); // обновляем чтобы отрендерить папку
@@ -97,7 +92,7 @@ const Files = () => {
                     className: "filesList"
                 },
                 React.createElement("li", {
-                    Key: -1
+                    key: -1
                 }, React.createElement("a", {
                         href: "#", onClick: (e) => update(e, -1),
                         className: "fileListElement"
@@ -107,8 +102,9 @@ const Files = () => {
                             React.createElement("p", {}, "../")
                     )
                 ),
-                arr.forEach((element, index) =>{
-                    if (index === current_direction){
+                arr.forEach((element) =>{
+                    var path = element[0]
+                    if (path === current_path){
                         var folders = element[1];
                         var files = element[2];
                         folders.forEach((folder, i) =>{
@@ -116,16 +112,15 @@ const Files = () => {
                             var folderModifDate = folder[1];
                             var folderSize = folder[2];
 
-                            i++; // ну не нада мне с 0 считать, не нада
                             elems.push(
                                 React.createElement("li", {
-                                        Key: i,
+                                        key: folderModifDate.hashCode()+folderName.hashCode()+folderSize.hashCode(),
                                         className: "fileLiElement"
                                     }, 
                                     React.createElement("a", {
                                             href: "#",
                                             className: "fileListElement",
-                                            onClick: (e) => update(e, i, String(element[0]+"/"+folderName))
+                                            onClick: (e) => update(e, i, element[0]+"/"+folderName)
                                         }, 
                                         React.createElement("img", {
                                             src: directoryPng
@@ -145,15 +140,14 @@ const Files = () => {
                                 )
                             )
                         });
-                        files.forEach((file, i) =>{
+                        files.forEach((file) =>{
                             var fileName = file[0];
                             var fileModifDate = file[1];
                             var fileSize = file[2];
 
-                            i = i+1337; // чтобы key папок и файлов отличались
                             elems.push(
                                 React.createElement("li", {
-                                        Key: i,
+                                        key: fileModifDate.hashCode()+fileName.hashCode()+fileSize.hashCode(),
                                         className: "fileLiElement"
                                     }, 
                                     React.createElement("a", {

@@ -4,8 +4,6 @@ from datetime import datetime, timezone, timedelta
 from flask import Flask, send_from_directory, jsonify
 from pathlib import Path
 
-
-
 UPLOAD_FOLDER = os.path.abspath(os.path.dirname(sys.argv[0]))+"/files/"
 
 app = Flask(__name__)
