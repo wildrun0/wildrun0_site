@@ -15,7 +15,7 @@ const Navbar = () => {
                 </div>
                 <div className="buttons">
                     <NavbarButton href="/play" text="PLAY"/>
-                    <NavbarButton href="/exp" text="EXPEREMENTAL"/>
+                    <NavbarButton href="/experimental" text="EXPERIMENTAL"/>
                     <NavbarButton href="/files" text="FILES"/>
                 </div>
             </ul>

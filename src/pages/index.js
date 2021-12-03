@@ -6,6 +6,7 @@ import Layout from '../components/Layout'
 import Play from './play'
 import Main from './main'
 import Files from './files'
+import Experimental from './experimental'
 
 const Pages = () => {
     return(
@@ -14,6 +15,7 @@ const Pages = () => {
                 <Routes>
                     <Route exact path="/" element={<Main />}/>
                     <Route path="/play" element={<Play />}/>
+                    <Route path="/experimental" element={<Experimental />}/>
                     <Route path="/files" element={<Files />}/>
                 </Routes>
             </Layout>

@@ -1,0 +1,22 @@
+.win_icon{
+    width:fit-content;
+    height: 65px;
+}
+.win_icon:hover{
+    cursor: pointer;
+}
+.win_icon p{
+    text-align: center;
+}
+.win_icon:hover p{
+    background:blue;
+    color:white;
+}
+/* .win_icon:hover img{
+    background: blue;  
+} */
+.win_icon img{
+    width: 40px;
+    display: flex;
+    margin: 0 auto;
+}

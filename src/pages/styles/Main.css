@@ -2,7 +2,8 @@
     --image-width: 330px;
 }
 body{
-    background-color: #a3a3a3;
+    background-color: rgb(0 128 128 / 86%);
+    /* background-color: #a3a3a3; */
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
@@ -16,6 +17,10 @@ body{
      width:335px;
 }
 @media (max-width:500px){
+    .about-main p{
+        font-size: 13px;
+        font-family: "W95FA", sans-serif;
+    }
     .iconAuthorStyle{
         bottom: -200px;
     }
@@ -40,6 +45,10 @@ body{
     }
 }
 @media (min-width:501px) {
+    .about-main p{
+        font-size: 15px;
+        font-family: "W95FA", sans-serif;
+    }
     .iconAuthorStyle{
         bottom:0;
     }
@@ -89,8 +98,6 @@ blockquote {
     user-select: none;
 }
 .about-main p {
-    font-size: 13px;
-    font-family: "W95FA", sans-serif;
     cursor: default;
 
     -moz-user-select: none;

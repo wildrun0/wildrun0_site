@@ -8,12 +8,12 @@ body{
     padding:0;
     margin: 0 auto;
 }
-.navbar-container-main{
+.navbar-container-main {
     display: grid;
     grid-template-columns: minmax(50px, auto) 1fr;
-    height:55px;
-    background: linear-gradient(270deg,rgb(0, 128,128),rgb(0 171 171))
-    /* background-color: rgb(0, 128,128); */
+    height: 55px;
+    background: linear-gradient(90deg,white,#249191);
+    /* border-radius: 6px; */
 }
 .logotext{
     display: grid;
@@ -46,7 +46,7 @@ body{
     }
     .layout-container {
         width: 100%;
-        margin: 20px auto 0 auto;
+        /* margin: 20px auto 0 auto; */
     }
     .logotext img{
         vertical-align: middle;
@@ -67,6 +67,6 @@ body{
 @media (min-width:501px) {
     .layout-container {
         width: 850px;
-        margin: 100px auto 0 auto;
+        margin: 50px auto 0 auto;
     }
 }

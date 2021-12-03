@@ -1,0 +1,35 @@
+.exp_menu{
+    margin: auto;
+}
+.exp_icons_grid{
+    display: grid;
+    justify-items: center;
+    align-items: center;
+}
+.exp_icons_grid a{
+    color: black;
+}
+.exp_icons_grid a:active, .exp_icons_grid a:focus{
+    outline: none;
+}
+.exp_title{
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+@media (min-width:501px){
+    .exp_icons_grid{
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .exp_menu{
+        width:550px;
+    }    
+}
+@media (max-width:500px) {
+    .exp_menu{
+        width:100%;
+    }
+    .exp_icons_grid{
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
