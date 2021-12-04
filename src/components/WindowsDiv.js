@@ -20,7 +20,9 @@ document.addEventListener("touchstart", (e) =>{
 })
 
 function handleClose(div){
-    document.getElementsByClassName(div)[0].style.visibility = "hidden";
+    var elem = document.getElementsByClassName(div)[0];
+    elem.parentNode.removeChild(elem);
+    // document.getElementsByClassName(div)[0].style.visibility = "hidden";
 }
 function handleMinimize(div){
     var div_element = document.getElementsByClassName(div)[0]
