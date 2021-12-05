@@ -33,7 +33,11 @@ def get_advanced_files_info(_root, files):
 
         file_info.append([file, last_modified_date, file_size]) 
     return file_info
-
+def list_folder(path):
+    files = []
+    for i in os.listdir(path):
+        files.append(i)
+    return files
 def tree_dir(startpath):
     paths = []
     for root, dirs, files in os.walk(startpath):
@@ -54,9 +58,18 @@ def list_files():
 
     return response
 
+@app.route("/files/music", methods=["GET"])
+def list_music():
+    files = list_folder(app.config['UPLOAD_FOLDER']+"/music/")
+
+    response = jsonify(files)
+    response.headers.add('Access-Control-Allow-Origin', "*") #в будущем заменить на https://wildrun0.dev
+    return response
+
 @app.route('/files/<path:file>', methods=["GET"])
 def send_file(file):
     return send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True)
+
 
 if __name__ == "__main__":
     app.run(host="192.168.0.101", port=1337, debug=True)

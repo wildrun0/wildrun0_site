@@ -21,7 +21,7 @@ var filesIcons = {
         ['7z','zip', 'rar'].map(key => [key, zipFilePng])
     ),
     ...Object.fromEntries(
-        ['mp3','wav', 'ogg', 'flac'].map(key => [key, musicFilePng])
+        ['mp3','wav', 'ogg', 'flac', 'm4a'].map(key => [key, musicFilePng])
     ),
     ...Object.fromEntries(
         ['mp4','mkv', 'avi'].map(key => [key, videoFilePng])
