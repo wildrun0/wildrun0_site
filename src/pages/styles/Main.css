@@ -71,9 +71,11 @@ body{
     grid-template-columns: 1fr 1fr;
     grid-gap:10px;
 }
-blockquote {
+.about-main blockquote {
     margin:0 auto;
     padding: 20px;
+}
+blockquote{
     background: #dfdfdf;
 }
 .title-bar-text{

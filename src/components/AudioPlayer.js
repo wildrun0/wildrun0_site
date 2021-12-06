@@ -12,6 +12,8 @@ const AudioPlayer = props => {
 
     const cover = document.getElementsByClassName("musicPlayer_coverTag")[0];
     const title = document.getElementsByClassName("musicPlayer_trackName")[0];
+    const bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
+    const duration = document.getElementsByClassName("musicPlayer_duration")[0];
     useEffect(() => {
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
@@ -41,8 +43,43 @@ const AudioPlayer = props => {
     var audioSrc;
     var audio;
     var prev_song;
-    var song_duration;
-    function play_music(song){
+    var countDown;
+    function count_time(song_duration){
+        countDown = setInterval(function() {
+            var currentTime_humanized = new Date(audio.currentTime * 1000).toISOString().substr(14, 5);
+            var totalTime_humanized = new Date(song_duration * 1000).toISOString().substr(14, 5);
+            duration.innerHTML = currentTime_humanized+" / "+totalTime_humanized;
+        }, 500);
+    }
+    async function setAudio(url){
+        var audio_size;
+        var kbit;
+        await fetch(url).then( resp =>{
+            resp.headers.forEach((value, key) => {
+                if (key === "content-length"){
+                    audio_size = value;
+                }
+            })
+            kbit = audio_size/128;
+        })
+        audio = new Audio(url);
+        audio.volume = audio_val;
+        audio.preload = "auto";
+        audio.onloadedmetadata = function(){
+            var song_duration = audio.duration;
+            var song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
+            bitrate.innerHTML = song_bitrate+" kbps";
+            clearInterval(countDown)
+            count_time(song_duration)
+        }
+        audio.addEventListener("ended", function(){
+            audio.currentTime = 0;
+            cover.pause();
+            cover.currentTime = 0;
+            title.innerHTML = ""
+       });
+    }
+    async function play_music(song){
         if (!after_pause){
             cover.pause();
             cover.currentTime = 0;
@@ -57,25 +94,14 @@ const AudioPlayer = props => {
             try{
                 audio.pause();
             } catch {}
-            audio = new Audio(audioSrc);
-            audio.volume = audio_val;
+            await setAudio(audioSrc)
         }
-        audio.preload = "auto";
         try{
             audio.play();
         } catch (err){
             console.log(err)
         }
         prev_song = song;
-        audio.onloadedmetadata = function(){
-            song_duration = audio.duration;
-        }
-        audio.addEventListener("ended", function(){
-            audio.currentTime = 0;
-            cover.pause();
-            cover.currentTime = 0;
-            title.innerHTML = ""
-       });
     }
     function pauseSong(){
         if (song_playing){
@@ -142,6 +168,8 @@ const AudioPlayer = props => {
                     <div className="musicPlayer_controls">
                         <button className="musicPlayer_playBtn" onClick={() => setSong(selectedSongs[0])}><div className = "play" /></button>
                         <button className="musicPlayer_pauseBtn" onClick={pauseSong}><div className = "pause" /></button>
+                        <button className="musicPlayer_bitrate" disabled></button>
+                        <blockquote className="musicPlayer_duration">01:02 / 08:21</blockquote>
                     </div>
                     <div className = "musicPlayer_volume">
                         <div className="field-row">

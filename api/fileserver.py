@@ -48,7 +48,6 @@ def tree_dir(startpath):
 
         paths.append((_root, dirs_modified, files_modified))
     return paths
-
 @app.route("/files", methods=["GET"])
 def list_files():
     files = tree_dir(app.config['UPLOAD_FOLDER'])
@@ -68,7 +67,9 @@ def list_music():
 
 @app.route('/files/<path:file>', methods=["GET"])
 def send_file(file):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True)
+    response = send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True)
+    response.headers.add('Access-Control-Allow-Origin', "*") #в будущем заменить на https://wildrun0.dev
+    return response
 
 
 if __name__ == "__main__":
