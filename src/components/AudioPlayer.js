@@ -45,10 +45,14 @@ const AudioPlayer = props => {
     var prev_song;
     var countDown;
     function count_time(song_duration){
+        var currentTime_humanized;
+        var totalTime_humanized;
         countDown = setInterval(function() {
-            var currentTime_humanized = new Date(audio.currentTime * 1000).toISOString().substr(14, 5);
-            var totalTime_humanized = new Date(song_duration * 1000).toISOString().substr(14, 5);
-            duration.innerHTML = currentTime_humanized+" / "+totalTime_humanized;
+            if (song_playing){
+                currentTime_humanized = new Date(audio.currentTime * 1000).toISOString().substr(14, 5);
+                totalTime_humanized = new Date(song_duration * 1000).toISOString().substr(14, 5);
+                duration.innerHTML = currentTime_humanized+" / "+totalTime_humanized;
+            }
         }, 500);
     }
     async function setAudio(url){

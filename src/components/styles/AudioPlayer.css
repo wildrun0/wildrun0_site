@@ -108,6 +108,7 @@
     grid-template-columns: 0fr 0fr 0fr 1fr;
 }
 .musicPlayer_bitrate{
+    height: 25px;
     color:black;
     min-width: auto;
     width: 55px;
@@ -121,5 +122,5 @@
     display: block;
     width: 100%;
     text-align: center;
-    padding-top: 5px;
+    padding-top: 6px;
 }
