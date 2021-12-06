@@ -3,11 +3,15 @@ import WindowsDiv from './WindowsDiv';
 import './styles/AudioPlayer.css';
 
 import yandhiCover from '../icons/programms_stuff/yandhi.mp4';
+// не забудь поменять айпи здесь и в fileserver.py
 const api_addr = "http://192.168.0.101:1337";
 const AudioPlayer = props => {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState([]);
+
+    const cover = document.getElementsByClassName("musicPlayer_coverTag")[0];
+    const title = document.getElementsByClassName("musicPlayer_trackName")[0];
     useEffect(() => {
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
@@ -28,6 +32,7 @@ const AudioPlayer = props => {
         el.getClientRects(); //forces layout / reflow (хуй знает как перевести)
         el.style.animation = null; 
     }
+
     var selectedSongs = [];
     var after_pause = false;
     var song_playing = false;
@@ -38,14 +43,11 @@ const AudioPlayer = props => {
     var prev_song;
     var song_duration;
     function play_music(song){
-        var cover = document.getElementsByClassName("musicPlayer_coverTag")[0]
         if (!after_pause){
             cover.pause();
             cover.currentTime = 0;
             reset_animation();
         } else{
-            var title = document.getElementsByClassName("musicPlayer_trackName")[0];
-            console.log(title.width)
             title.style.animationPlayState = "running";
             after_pause = false;
         }
@@ -59,26 +61,35 @@ const AudioPlayer = props => {
             audio.volume = audio_val;
         }
         audio.preload = "auto";
-        audio.play();
+        try{
+            audio.play();
+        } catch (err){
+            console.log(err)
+        }
         prev_song = song;
         audio.onloadedmetadata = function(){
             song_duration = audio.duration;
         }
+        audio.addEventListener("ended", function(){
+            audio.currentTime = 0;
+            cover.pause();
+            cover.currentTime = 0;
+            title.innerHTML = ""
+       });
     }
     function pauseSong(){
-        var cover = document.getElementsByClassName("musicPlayer_coverTag")[0]
-        var title = document.getElementsByClassName("musicPlayer_trackName")[0];
-        cover.pause();
-        title.style.animationPlayState = "paused";
-        title.innerHTML = "PAUSED: " + title.innerHTML;
-        audio.pause();
-        song_playing = false;
-        after_pause = true;
+        if (song_playing){
+            cover.pause();
+            title.style.animationPlayState = "paused";
+            title.innerHTML = "PAUSED: " + title.innerHTML;
+            audio.pause();
+            song_playing = false;
+            after_pause = true;
+        }
     }
     function setSong(name){
-        if (!song_playing){
+        if (!song_playing && selectedSongs.length > 0){
             audioSrc = name.getAttribute("link");
-            var title = document.getElementsByClassName("musicPlayer_trackName")[0];
             title.innerHTML = name.textContent;
             play_music(name)
         }
@@ -112,8 +123,8 @@ const AudioPlayer = props => {
         <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true}>
             <div className = "musicPlayer_grid">
                 <div className="musicPlayer_cover">
-                    <video loop muted playsInline className="musicPlayer_coverTag">
-                        <source src={yandhiCover} type="video/mp4" />
+                    <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
+                        <source src={yandhiCover + "#t=0.1"} type="video/mp4" />
                     </video>
                 </div>
                 <div className = "musicPlayer_player">
@@ -123,7 +134,7 @@ const AudioPlayer = props => {
                         {
                             items.map((song) =>{
                                 return(
-                                    <p link={api_addr+"/files/music/"+song}> {song} </p>
+                                    <p key={song.hashCode()}link={api_addr+"/files/music/"+song}> {song} </p>
                                 )
                             })
                         }

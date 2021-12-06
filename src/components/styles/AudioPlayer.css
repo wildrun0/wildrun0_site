@@ -24,11 +24,12 @@
               transform: translateX(182px);
     }
     to {
-      -webkit-transform: translateX(-150%);
-              transform: translateX(-150%);
+      -webkit-transform: translateX(-110%);
+              transform: translateX(-110%);
     }
 }
 .musicPlayer_trackName{
+    width: fit-content;
     margin:0;
     font-size: 11px;
     animation: slide-left 20s linear infinite;
