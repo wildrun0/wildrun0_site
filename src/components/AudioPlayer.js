@@ -5,7 +5,8 @@ import './styles/AudioPlayer.css';
 import yandhiCover from '../icons/programms_stuff/yandhi.mp4';
 
 // не забудь поменять айпи здесь и в fileserver.py
-const api_addr = process.env.API_ADDRESS || "localhost";
+const api_addr = `${process.env.REACT_APP_API_ADDRESS}`;
+console.log(api_addr)
 
 const AudioPlayer = props => {
     const [error, setError] = useState(null);
@@ -191,7 +192,7 @@ const AudioPlayer = props => {
                         <button className="musicPlayer_playBtn" onClick={() => setSong(selectedSongs[0])}><div className = "play" /></button>
                         <button className="musicPlayer_pauseBtn" onClick={pauseSong}><div className = "pause" /></button>
                         <button className="musicPlayer_bitrate" disabled></button>
-                        <blockquote className="musicPlayer_duration">01:02 / 08:21</blockquote>
+                        <blockquote className="musicPlayer_duration"></blockquote>
                     </div>
                     <div className = "musicPlayer_volume">
                         <div className="field-row">
