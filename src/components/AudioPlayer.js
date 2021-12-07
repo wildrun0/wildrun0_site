@@ -3,8 +3,10 @@ import WindowsDiv from './WindowsDiv';
 import './styles/AudioPlayer.css';
 
 import yandhiCover from '../icons/programms_stuff/yandhi.mp4';
+
 // не забудь поменять айпи здесь и в fileserver.py
-const api_addr = "http://192.168.0.101:1337";
+const api_addr = process.env.API_ADDRESS || "localhost";
+
 const AudioPlayer = props => {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -14,6 +16,7 @@ const AudioPlayer = props => {
     const title = document.getElementsByClassName("musicPlayer_trackName")[0];
     const bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
     const duration = document.getElementsByClassName("musicPlayer_duration")[0];
+
     useEffect(() => {
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
@@ -28,6 +31,7 @@ const AudioPlayer = props => {
           }
         )
     }, [])
+
     function reset_animation() {
         var el = document.getElementsByClassName("musicPlayer_trackName")[0];
         el.style.animation = 'none';
@@ -44,6 +48,7 @@ const AudioPlayer = props => {
     var audio;
     var prev_song;
     var countDown;
+
     function count_time(song_duration){
         var currentTime_humanized;
         var totalTime_humanized;
@@ -51,10 +56,11 @@ const AudioPlayer = props => {
             if (song_playing){
                 currentTime_humanized = new Date(audio.currentTime * 1000).toISOString().substr(14, 5);
                 totalTime_humanized = new Date(song_duration * 1000).toISOString().substr(14, 5);
-                duration.innerHTML = currentTime_humanized+" / "+totalTime_humanized;
+                duration.innerHTML = currentTime_humanized + " / " + totalTime_humanized;
             }
         }, 500);
     }
+
     async function setAudio(url){
         var audio_size;
         var kbit;
@@ -83,6 +89,7 @@ const AudioPlayer = props => {
             title.innerHTML = ""
        });
     }
+
     async function play_music(song){
         if (!after_pause){
             cover.pause();
@@ -107,6 +114,7 @@ const AudioPlayer = props => {
         }
         prev_song = song;
     }
+
     function pauseSong(){
         if (song_playing){
             cover.pause();
@@ -117,6 +125,7 @@ const AudioPlayer = props => {
             after_pause = true;
         }
     }
+
     function setSong(name){
         if (!song_playing && selectedSongs.length > 0){
             audioSrc = name.getAttribute("link");
@@ -124,6 +133,7 @@ const AudioPlayer = props => {
             play_music(name)
         }
     }
+
     function songClicked(e){
         var song = e.target;
         if (song.tagName !== "DIV"){
@@ -143,14 +153,22 @@ const AudioPlayer = props => {
             }
         }
     }
+
     function changeVolume(e){
         audio_val = e.target.value/100
         try{
             audio.volume = audio_val;
         } catch{}
     }
+
+    function closeHandle(elementClassName){
+        var elem = document.getElementsByClassName(elementClassName)[0];
+        elem.parentNode.removeChild(elem);
+        props.playersList.pop();
+    }
+
     return(
-        <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true}>
+        <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} customHandleClose={closeHandle}>
             <div className = "musicPlayer_grid">
                 <div className="musicPlayer_cover">
                     <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
@@ -183,7 +201,7 @@ const AudioPlayer = props => {
                             <label htmlFor="range24">High</label>
                         </div>
                     </div>
-            </div>
+                </div>
             </div>
         </WindowsDiv>
     )

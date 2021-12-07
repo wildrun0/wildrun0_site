@@ -5,7 +5,9 @@ import AudioPlayer from '../components/AudioPlayer';
 
 import './styles/Experimental.css'
 import MusicIcon from '../icons/cdPlayer.png'
+
 var programms_started = []
+
 const Experimental = () => {
     const [, forceUpdate] = useReducer(x => x + 1, 0);
     // тута выбираем и отправляем в массив нужную "программу"
@@ -13,7 +15,7 @@ const Experimental = () => {
         var programm_content;
         if (name === "Music Player"){
             programm_content = (
-                <AudioPlayer name="Music Player" />
+                <AudioPlayer name="Music Player" playersList={programms_started}/>
             )
         }
         if(programm_content !== undefined){

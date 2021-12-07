@@ -73,4 +73,4 @@ def send_file(file):
 
 
 if __name__ == "__main__":
-    app.run(host="192.168.0.101", port=1337, debug=True)
+    app.run(host="localhost", port=1337, debug=True)

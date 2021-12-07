@@ -52,9 +52,15 @@ const WindowsDiv = props => {
                     <div className="title-bar">
                         <div className="title-bar-text">{props.title}</div>
                         <div className="title-bar-controls" style={{display: props.enableControls ? "":"none"}}>
-                            <button aria-label="Minimize" onClick={() => handleMinimize(props.className)}></button>
-                            <button aria-label="Maximize" onClick={() => handleMaximize(props.className)}></button>
-                            <button aria-label="Close" onClick={() => handleClose(props.className)}></button>
+                            <button aria-label="Minimize" onClick={() => handleMinimize(props.className)} />
+                            <button aria-label="Maximize" onClick={() => handleMaximize(props.className)} />
+                            <button aria-label="Close" onClick={() => {
+                                try {
+                                    props.customHandleClose(props.className)
+                                } catch {
+                                    handleClose(props.className)
+                                }
+                            }}/>
                         </div>
                     </div>
                     <div className="window-body">

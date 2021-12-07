@@ -13,6 +13,7 @@ import zipFilePng from "../icons/zipFile.png"
 import defaultFilePng from "../icons/defaultFile.png"
 import musicFilePng from '../icons/musicFile.png'
 import videoFilePng from "../icons/videoFile.png"
+
 var filesIcons = {
     'unknown': defaultFilePng,
     'txt': txtFilePng,
@@ -28,7 +29,7 @@ var filesIcons = {
     )
 }
 
-var api_addr = "http://192.168.0.101:1337";
+var api_addr = process.env.API_ADDRESS || "localhost"; //"http://192.168.0.101:1337";
 
 var current_path = "/files";
 
@@ -110,7 +111,7 @@ const Files = () => {
                         React.createElement("p", {}, "../")
                     )
                 ),
-                arr.forEach((element) =>{
+                arr.forEach((element) => {
                     var path = element[0];
                     if (path === current_path){
                         var folders = element[1];
