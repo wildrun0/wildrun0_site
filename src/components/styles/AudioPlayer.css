@@ -1,5 +1,5 @@
 .musicPlayer_window{
-    width: 400px;
+    width: 435px;
     position: relative;
 }
 .musicPlayer_cover video{
@@ -12,11 +12,7 @@
     grid-gap: 5px;
 }
 .musicPlayer_player{
-    position: relative;
-}
-.musicPlayer_volume{
-    position: absolute;
-    bottom: 0;
+    display: grid;
 }
 @keyframes slide-left {
     from {
@@ -38,7 +34,7 @@
     background-color: black;
     color: #00ff00;
     font-family: 'Microsoft Sans Serif';
-    width: 180px;
+    width: 95%;
     height: 12px;
     overflow-x: scroll;
     white-space: nowrap;
@@ -49,17 +45,14 @@
     display: none;
 }
 .musicPlayer_currentlyPlaying{
-    text-align: center;
-    margin: 0;
+    margin: 0 auto;
     font-weight: bold;
-    margin-bottom: 3px;
 }
 .musicPlayer_songsList{
     background: white;
-    width:180px;
-    height: 72px;
+    width: 95%;
+    height: 74px;
     overflow-y: auto;
-    margin-top: 5px;
     padding: 3px;
 }
 .musicPlayer_songsList p{
@@ -103,9 +96,9 @@
     outline: none;
 }
 .musicPlayer_controls{
-    margin-top: 30px;
     display: grid;
     grid-template-columns: 0fr 0fr 0fr 1fr;
+    height: fit-content;
 }
 .musicPlayer_bitrate{
     height: 25px;
@@ -123,4 +116,11 @@
     width: 100%;
     text-align: center;
     padding-top: 6px;
+}
+.musicPlayer_musicTrack{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.musicPlayer_musicTrack input[type='range']::-webkit-slider-runnable-track{
+    height: 2.2px;
 }

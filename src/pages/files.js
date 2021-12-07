@@ -189,7 +189,7 @@ const Files = () => {
     }
     if (error) {
         return(
-            <WindowsDiv title="ERROR" className="error" drag={false}>
+            <WindowsDiv title="FILE SYSTEM ERROR" className="error" drag={false}>
                 <div className="loading-error-body">
                     <img src={errorPng} alt="Error"></img>
                     <p><b>Error happend: {error.message}.</b> This was probably caused because of internal server error or 

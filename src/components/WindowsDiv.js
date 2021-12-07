@@ -45,21 +45,43 @@ function handleMaximize(div){
     }
 }
 const WindowsDiv = props => {
+    var to_apply = {}
+    var handler = "title-bar";
+
+    function teleport_end(e){
+        if (e.target.tagName !== "BUTTON"){
+            var obj = e.target.parentNode.parentNode
+            var style = obj.style;
+            var pos = style.transform || style.webkitTransform || style.mozTransform;
+            sessionStorage.setItem(props.title, pos);
+        }
+    }
+
+    var transform = sessionStorage.getItem(props.title);
+    try{
+        
+        var coords = transform.replace("translate", "").replace("(","").replace(")", "").split(',');
+        to_apply["x"] = parseInt(coords[0].replace('px',""));
+        to_apply["y"] = parseInt(coords[1].replace('px', ''));
+    } catch (err) {
+        to_apply["x"] = 0;
+        to_apply["y"] = 0;
+    }
+
     return(
-        <Draggable bounds={window.innerWidth < 500 ? "body":"html"} handle=".title-bar" onStart={() => props.drag}>
+        <Draggable defaultPosition={to_apply} bounds={window.innerWidth < 500 ? "body":"html"} handle = {"." + handler} onStart={() => props.drag}>
             <div className={props.className}>
                 <div className="window">
-                    <div className="title-bar">
+                    <div className="title-bar" onMouseUp={teleport_end}>
                         <div className="title-bar-text">{props.title}</div>
                         <div className="title-bar-controls" style={{display: props.enableControls ? "":"none"}}>
                             <button aria-label="Minimize" onClick={() => handleMinimize(props.className)} />
                             <button aria-label="Maximize" onClick={() => handleMaximize(props.className)} />
-                            <button aria-label="Close" onClick={() => {
-                                try {
-                                    props.customHandleClose(props.className)
-                                } catch {
-                                    handleClose(props.className)
-                                }
+                            <button aria-label="Close" onClick={() =>{
+                                 handleClose(props.className)
+                                 try{
+                                     props.onclose(true)
+                                 } catch {}
                             }}/>
                         </div>
                     </div>

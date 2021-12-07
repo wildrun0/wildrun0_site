@@ -9,24 +9,21 @@ const api_addr = process.env.REACT_APP_API_ADDRESS;
 
 const AudioPlayer = props => {
     const [error, setError] = useState(null);
-    const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState([]);
 
     const cover = document.getElementsByClassName("musicPlayer_coverTag")[0];
     const title = document.getElementsByClassName("musicPlayer_trackName")[0];
     const bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
     const duration = document.getElementsByClassName("musicPlayer_duration")[0];
-
+    const track = document.getElementsByClassName("musicTrack")[0];
     useEffect(() => {
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
         .then(
           (result) => {
-            setIsLoaded(true);
             setItems(result);
           },
           (error) => {
-            setIsLoaded(true);
             setError(error);
           }
         )
@@ -40,23 +37,35 @@ const AudioPlayer = props => {
     }
 
     var selectedSongs = [];
+    var chaningCurrentTime = false;
     var after_pause = false;
     var song_playing = false;
-    var audio_val = 0.25;
+    var audio_val = localStorage.getItem("audio_val");
     
     var audioSrc;
     var audio;
     var prev_song;
     var countDown;
 
+    function onTrackMovement(e){
+        chaningCurrentTime = true;
+        audio.currentTime = e.target.value;
+        chaningCurrentTime = false;
+    }
+
     function count_time(song_duration){
+        var current_time;
         var currentTime_humanized;
         var totalTime_humanized;
         countDown = setInterval(function() {
             if (song_playing){
-                currentTime_humanized = new Date(audio.currentTime * 1000).toISOString().substr(14, 5);
+                current_time = audio.currentTime
+                currentTime_humanized = new Date(current_time * 1000).toISOString().substr(14, 5);
                 totalTime_humanized = new Date(song_duration * 1000).toISOString().substr(14, 5);
                 duration.innerHTML = currentTime_humanized + " / " + totalTime_humanized;
+                if (!chaningCurrentTime){
+                    track.value = current_time;
+                }
             }
         }, 500);
     }
@@ -79,6 +88,7 @@ const AudioPlayer = props => {
             var song_duration = audio.duration;
             var song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
             bitrate.innerHTML = song_bitrate+" kbps";
+            track.max = song_duration;
             clearInterval(countDown)
             count_time(song_duration)
         }
@@ -87,6 +97,11 @@ const AudioPlayer = props => {
             cover.pause();
             cover.currentTime = 0;
             title.innerHTML = ""
+            bitrate.innerHTML = "";
+            clearInterval(countDown);
+            duration.innerHTML = "";
+            track.disabled = true;
+            track.value = track.max = 0;
        });
     }
 
@@ -112,7 +127,13 @@ const AudioPlayer = props => {
         } catch (err){
             console.log(err)
         }
+        track.disabled = false;
         prev_song = song;
+        track.addEventListener("mousedown", (e) =>{
+            chaningCurrentTime = true;
+        })
+        track.addEventListener('change', onTrackMovement, true)
+
     }
 
     function pauseSong(){
@@ -155,24 +176,29 @@ const AudioPlayer = props => {
     }
 
     function changeVolume(e){
-        audio_val = e.target.value/100
+        audio_val = (e.target.value*0.01);
+        audio_val = audio_val <= 0.05 ? audio_val - 0.01: audio_val; // делаем значения от 0.00 до 1.00
+        localStorage.setItem("audio_val", audio_val)
         try{
             audio.volume = audio_val;
-        } catch{}
+        } catch {}
     }
 
-    function closeHandle(elementClassName){
-        var elem = document.getElementsByClassName(elementClassName)[0];
-        elem.parentNode.removeChild(elem);
-        props.playersList.pop();
+    function closeHandle(props){
+        props.onclose(props.id)
         try{
             audio.pause();
             audio.currentTime = 0;
         } catch {}
     }
 
+    if (error){
+        try{
+            document.getElementsByClassName("musicPlayer_songsList")[0].innerHTML = "UNABLE TO FETCH SONGS"
+        } catch {}
+    }
     return(
-        <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} customHandleClose={closeHandle}>
+        <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} onclose={() => closeHandle(props)} saveCoords={true}>
             <div className = "musicPlayer_grid">
                 <div className="musicPlayer_cover">
                     <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
@@ -191,6 +217,11 @@ const AudioPlayer = props => {
                             })
                         }
                     </div>
+                    <div className = "musicPlayer_musicTrack">
+                        <div className="field-row">
+                            <input id="range25" className="has-box-indicator musicTrack" type="range" defaultValue = "0" disabled/>
+                        </div>
+                    </div>
                     <div className="musicPlayer_controls">
                         <button className="musicPlayer_playBtn" onClick={() => setSong(selectedSongs[0])}><div className = "play" /></button>
                         <button className="musicPlayer_pauseBtn" onClick={pauseSong}><div className = "pause" /></button>
@@ -201,7 +232,7 @@ const AudioPlayer = props => {
                         <div className="field-row">
                             <label htmlFor="range22">Volume:</label>
                             <label htmlFor="range23">Low</label>
-                            <input id="range23" type="range" min="1" max="100" defaultValue = "25" onChange={changeVolume} />
+                            <input id="range23" type="range" min="1" max="100" defaultValue = {localStorage.getItem("audio_val")*100} onChange={changeVolume} />
                             <label htmlFor="range24">High</label>
                         </div>
                     </div>

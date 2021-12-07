@@ -17,6 +17,10 @@
     font-weight: bold;
     font-size: 18px;
 }
+.exp_container .error{
+    margin:0;
+    position: absolute;
+}
 @media (min-width:501px){
     .exp_icons_grid{
         grid-template-columns: repeat(6, 1fr);
