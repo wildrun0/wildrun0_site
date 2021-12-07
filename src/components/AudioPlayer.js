@@ -5,8 +5,7 @@ import './styles/AudioPlayer.css';
 import yandhiCover from '../icons/programms_stuff/yandhi.mp4';
 
 // не забудь поменять айпи здесь и в fileserver.py
-const api_addr = `${process.env.REACT_APP_API_ADDRESS}`;
-console.log(api_addr)
+const api_addr = process.env.REACT_APP_API_ADDRESS;
 
 const AudioPlayer = props => {
     const [error, setError] = useState(null);
@@ -166,6 +165,10 @@ const AudioPlayer = props => {
         var elem = document.getElementsByClassName(elementClassName)[0];
         elem.parentNode.removeChild(elem);
         props.playersList.pop();
+        try{
+            audio.pause();
+            audio.currentTime = 0;
+        } catch {}
     }
 
     return(

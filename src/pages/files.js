@@ -29,7 +29,7 @@ var filesIcons = {
     )
 }
 
-var api_addr = `${process.env.REACT_APP_API_ADDRESS}`
+var api_addr = process.env.REACT_APP_API_ADDRESS;
 var current_path = "/files";
 
 // Чтобы создать уникальные key для каждого <li> элемента
