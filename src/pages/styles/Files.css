@@ -15,7 +15,6 @@
     width:0;
 }
 .pathText {
-    font-size: 11px;
     width: 90%;
     overflow-x: scroll;
     white-space: nowrap;
@@ -63,7 +62,6 @@
     color: black;
 }
 .fileLiElement {
-    font-size:12px;
     display: grid;
     grid-template-columns: 2fr 1fr 0fr;
 }
@@ -76,7 +74,6 @@
     overflow: hidden;
     white-space: nowrap;
     width:250px;
-    font-size:11px;
 }
 .error{
     width: 350px;
@@ -102,7 +99,6 @@
 .fileSize{
     width: 45px;
     text-align: right;
-    font-size:11px;
     letter-spacing: 0.05em;
 }
 @media (min-width:501px) {
@@ -137,7 +133,6 @@
     }
     .fileListElement p{
         width: 150px;
-        font-size: 12px;
     }
     .fileListElement img{
         width: 35px;

@@ -29,6 +29,7 @@ const Experimental = () => {
             if (!programms_started_names.includes(name)){
                 programms_started[uniq_id] = programm_content;
                 programms_started_names.push(name)
+                forceUpdate();
             } else{
                 setError(
                     <WindowsDiv title="PROGRAMMS ERROR" className="error" drag={true} enableControls={true}>
@@ -39,7 +40,6 @@ const Experimental = () => {
                     </WindowsDiv>
                 )
             }
-            forceUpdate();
         }
     }
     var containerId = Date.now() / 1000 | 0 + Math.random()

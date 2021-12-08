@@ -25,6 +25,7 @@
     }
 }
 .musicPlayer_trackName{
+    font-family: 'Pixelated MS Sans Serif';
     width: fit-content;
     margin:0;
     font-size: 11px;
