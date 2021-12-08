@@ -1,0 +1,127 @@
+:root{
+    --div-height: 450px;
+}
+.container.files{
+    grid-gap:0;
+}
+.fileManagerDiv .window-body{
+    margin:0;
+}
+.pathDiv {
+    display: flex;
+    flex: 1 1;
+    background-color: white;
+    height: 22px;
+    width:0;
+}
+.pathText {
+    width: 90%;
+    overflow-x: scroll;
+    white-space: nowrap;
+    margin: auto 0 auto 5px;
+}
+.pathDiv div::-webkit-scrollbar{
+    display: none;
+}
+.title-path {
+    font-weight: normal;
+    font-style: normal;
+    margin-top:5px;
+    display: flex;
+    height: 25px;
+}
+.title-path button {
+    margin: auto;
+    margin-right: 1px;
+    text-shadow: none;
+    color: black;
+}
+.filesList{
+    font-weight: normal;
+    font-style: normal;
+    
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    padding: 0;
+}
+.fileListElement:active, .fileListElement:focus{
+    outline: none;
+}
+/* Баг в 98.css - двойная кнопка скролла */
+.filesList::-webkit-scrollbar-button{
+    display: none;
+}
+.fileListElement {
+    width: fit-content;
+    display: flex;
+    float: left;
+    color: black;
+}
+.fileLiElement {
+    display: grid;
+    grid-template-columns: 2fr 1fr 0fr;
+}
+.fileListElement img{
+    margin: auto;
+    margin-right:3px;
+}
+.fileListElement p{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width:250px;
+}
+.fileCreateDate{
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+.fileSize{
+    width: 45px;
+    text-align: right;
+    letter-spacing: 0.05em;
+}
+@media (min-width:501px) {
+    .fileListElement img{
+        width: 28px;
+    }
+    .fileManagerDiv{
+        width: 550px;
+    }
+    .fileManagerDiv .window-body{
+        height: var(--div-height);
+    }
+    .filesList{
+        max-height: calc(var(--div-height) - 75px);
+    }
+    .fileLiElement {
+        width:99%;
+    }
+}
+@media (max-width:500px){
+    .container.files{
+        display: flex;
+    }
+    .fileManagerDiv{
+        width: 100%;
+    }
+    .fileManagerDiv .window-body{
+        height: 100%;
+    }
+    .filesList{
+        height: 360px;
+    }
+    .fileListElement p{
+        width: 150px;
+    }
+    .fileListElement img{
+        width: 35px;
+    }
+    .fileLiElement{
+        margin:5px 0;
+        width: 97%;
+    }
+}

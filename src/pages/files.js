@@ -1,75 +1,16 @@
-import React, {useEffect, useState, useReducer} from 'react'
+import React, {useEffect, useState} from 'react'
+import FileManager from '../components/FileManager';
 import WindowsDiv from '../components/WindowsDiv';
 
+import errorPng from '../icons/error.png';
 import './styles/Files.css'
 
-import errorPng from '../icons/error.png'
-import directoryPng from '../icons/directory.png'
-import directoryBackPng from "../icons/directoryBack.png"
-import pathIcon from "../icons/pathIcon.png"
-
-import txtFilePng from "../icons/txtFile.png"
-import zipFilePng from "../icons/zipFile.png"
-import defaultFilePng from "../icons/defaultFile.png"
-import musicFilePng from '../icons/musicFile.png'
-import videoFilePng from "../icons/videoFile.png"
-
-var filesIcons = {
-    'unknown': defaultFilePng,
-    'txt': txtFilePng,
-    //несколько ключей к одному значению
-    ...Object.fromEntries(
-        ['7z','zip', 'rar'].map(key => [key, zipFilePng])
-    ),
-    ...Object.fromEntries(
-        ['mp3','wav', 'ogg', 'flac', 'm4a'].map(key => [key, musicFilePng])
-    ),
-    ...Object.fromEntries(
-        ['mp4','mkv', 'avi'].map(key => [key, videoFilePng])
-    )
-}
-
-var api_addr = process.env.REACT_APP_API_ADDRESS;
-var current_path = "/files";
-
-// Чтобы создать уникальные key для каждого <li> элемента
-// Ниже отключаем чтобы реакт не ругался на изменение String элемента
-// eslint-disable-next-line
-String.prototype.hashCode = function() {
-    var hash = 0, i, chr;
-    if (this.length === 0) return hash;
-    for (i = 0; i < this.length; i++) {
-      chr   = this.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-};
+const api_addr = process.env.REACT_APP_API_ADDRESS;
 
 const Files = () => {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [items, setItems] = useState([]);
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
-    function update(e, path){
-        e.preventDefault(); // двойной клик заебал
-
-        if (path !== undefined){
-            current_path = path
-            var path_el = document.getElementsByClassName("pathText")[0]
-            //работает только так
-            setTimeout(function(){
-                path_el.scrollLeft = 1500;    
-            },1);
-        } else{
-            if (current_path !== '/files'){
-                var current_path_arrayed = current_path.split('/')
-                current_path_arrayed.pop()
-                current_path = current_path_arrayed.join("/")
-            }
-        }
-        forceUpdate(); // обновляем чтобы отрендерить папку
-    }
     useEffect(() => {
         fetch(`${api_addr}/files`)
         .then(res => res.json())
@@ -84,109 +25,6 @@ const Files = () => {
           }
         )
     }, [])
-    function setFileIcon(fileName){
-        var re = /(?:\.([^.]+))?$/;
-        var fileExt = re.exec(fileName)[1];
-        return fileExt in filesIcons ? filesIcons[fileExt]:filesIcons['unknown'];
-    }
-    function listFiles(arr){
-        // собираю все в массив т.к. по нормальному оно работать не хочет (или я не придумал как сделать нормально....)
-        var elems = [];
-        return(
-            React.createElement("ul", {
-                        className: "filesList"
-                    },
-                React.createElement("li", {
-                        key: -1
-                    }, 
-                    React.createElement("a", {
-                            href: "#", onClick: (e) => update(e),
-                            className: "fileListElement"
-                        },
-                        React.createElement("img", {
-                                src: directoryBackPng
-                            }
-                        ),
-                        React.createElement("p", {}, "../")
-                    )
-                ),
-                arr.forEach((element) => {
-                    var path = element[0];
-                    if (path === current_path){
-                        var folders = element[1];
-                        var files = element[2];
-                        folders.forEach((folder) =>{
-                            var folderName = folder[0];
-                            var folderModifDate = folder[1];
-                            var folderSize = folder[2];
-                            var folderUniqHash = folderModifDate.hashCode()+folderName.hashCode()+folderSize.hashCode()
-                            elems.push(
-                                React.createElement("li", {
-                                        key: folderUniqHash,
-                                        className: "fileLiElement"
-                                    }, 
-                                    React.createElement("a", {
-                                            href: "#",
-                                            className: "fileListElement",
-                                            onClick: (e) => update(e, element[0]+"/"+folderName)
-                                        }, 
-                                        React.createElement("img", {
-                                            src: directoryPng
-                                        }),
-                                        React.createElement("p", {}, folderName)
-                                    ),
-                                    React.createElement("p",{
-                                            className: "fileCreateDate"
-                                        },
-                                        folderModifDate
-                                    ),
-                                    React.createElement("p",{
-                                            className: "fileSize"
-                                        },
-                                        folderSize
-                                    )
-                                )
-                            )
-                        });
-                        files.forEach((file) =>{
-                            var fileName = file[0];
-                            var fileModifDate = file[1];
-                            var fileSize = file[2];
-                            var fileUniqHash = fileModifDate.hashCode()+fileName.hashCode()+fileSize.hashCode()
-                            elems.push(
-                                React.createElement("li", {
-                                        key: fileUniqHash,
-                                        className: "fileLiElement"
-                                    }, 
-                                    React.createElement("a", {
-                                            href: api_addr+element[0]+'/'+fileName, 
-                                            download: '',
-                                            className: "fileListElement"
-                                        }, 
-                                        React.createElement("img", {
-                                            src: setFileIcon(fileName)
-                                        }),
-                                        React.createElement("p", {}, fileName)
-                                    ),
-                                    React.createElement("p",{
-                                            className: "fileCreateDate"
-                                        },
-                                        fileModifDate
-                                    ),
-                                    React.createElement("p",{
-                                            className: "fileSize"
-                                        },
-                                        fileSize
-                                    )
-                                )
-                            )
-                        });
-                    }
-                }),
-                elems
-            )
-        )
-    }
     if (error) {
         return(
             <WindowsDiv title="FILE SYSTEM ERROR" className="error" drag={false}>
@@ -201,21 +39,7 @@ const Files = () => {
         return <p className="loading">Loading...</p>;
     } else {
         return (
-            <div className="container files">
-                <WindowsDiv title="File Manager" className="fileManagerDiv" enableControls={true}>
-                    <div>
-                        <div className="title-path">
-                            <button type="button" disabled>Address</button>
-                            <div className="pathDiv">
-                                <img alt="path icon" src={pathIcon}></img>
-                                <div className="pathText">{current_path}</div>
-                            </div>
-                        </div>
-                        <hr></hr>
-                        {listFiles(items)}
-                    </div>
-                </WindowsDiv>
-            </div>
+            <FileManager api_address={api_addr} files={items} startPath="/files"/>
         );
     }
 }

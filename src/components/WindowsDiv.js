@@ -20,13 +20,12 @@ document.addEventListener("touchstart", (e) =>{
 })
 
 function handleClose(div){
-    var elem = document.getElementsByClassName(div)[0];
+    let elem = document.getElementsByClassName(div)[0];
     elem.parentNode.removeChild(elem);
-    // document.getElementsByClassName(div)[0].style.visibility = "hidden";
 }
 function handleMinimize(div){
-    var div_element = document.getElementsByClassName(div)[0]
-    var status_bar = div_element.getElementsByClassName("status-bar")[0]
+    let div_element = document.getElementsByClassName(div)[0]
+    let status_bar = div_element.getElementsByClassName("status-bar")[0]
 
     div_element.getElementsByClassName("window-body")[0].style.display = "none";
 
@@ -35,8 +34,8 @@ function handleMinimize(div){
     }
 }
 function handleMaximize(div){
-    var div_element = document.getElementsByClassName(div)[0]
-    var status_bar = div_element.getElementsByClassName("status-bar")[0]
+    let div_element = document.getElementsByClassName(div)[0]
+    let status_bar = div_element.getElementsByClassName("status-bar")[0]
 
     div_element.getElementsByClassName("window-body")[0].style.display = "";
 
@@ -45,22 +44,21 @@ function handleMaximize(div){
     }
 }
 const WindowsDiv = props => {
-    var to_apply = {}
-    var handler = "title-bar";
+    let to_apply = {}
+    let handler = "title-bar";
 
     function teleport_end(e){
         if (e.target.tagName !== "BUTTON"){
-            var obj = e.target.parentNode.parentNode
-            var style = obj.style;
-            var pos = style.transform || style.webkitTransform || style.mozTransform;
+            let obj = e.target.parentNode.parentNode
+            let style = obj.style;
+            let pos = style.transform || style.webkitTransform || style.mozTransform;
             sessionStorage.setItem(props.title, pos);
         }
     }
 
-    var transform = sessionStorage.getItem(props.title);
+    let transform = sessionStorage.getItem(props.title);
     try{
-        
-        var coords = transform.replace("translate", "").replace("(","").replace(")", "").split(',');
+        let coords = transform.replace("translate", "").replace("(","").replace(")", "").split(',');
         to_apply["x"] = parseInt(coords[0].replace('px',""));
         to_apply["y"] = parseInt(coords[1].replace('px', ''));
     } catch (err) {
@@ -78,10 +76,14 @@ const WindowsDiv = props => {
                             <button aria-label="Minimize" onClick={() => handleMinimize(props.className)} />
                             <button aria-label="Maximize" onClick={() => handleMaximize(props.className)} />
                             <button aria-label="Close" onClick={() =>{
-                                 handleClose(props.className)
-                                 try{
-                                     props.onclose(true)
-                                 } catch {}
+                                    if(props.handleClose !== undefined){
+                                        props.handleClose(document.getElementsByClassName(props.className)[0])
+                                    } else{
+                                        handleClose(props.className)
+                                    }
+                                    if(props.onclose !== undefined){
+                                        props.onclose(true)
+                                    }
                             }}/>
                         </div>
                     </div>

@@ -19,6 +19,7 @@
 }
 .exp_container .error{
     margin:0;
+    visibility: hidden;
     position: absolute;
 }
 @media (min-width:501px){
