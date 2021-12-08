@@ -30,22 +30,22 @@ const AudioPlayer = props => {
     }, [])
 
     function reset_animation() {
-        var el = document.getElementsByClassName("musicPlayer_trackName")[0];
+        let el = document.getElementsByClassName("musicPlayer_trackName")[0];
         el.style.animation = 'none';
         el.getClientRects(); //forces layout / reflow (хуй знает как перевести)
         el.style.animation = null; 
     }
 
-    var selectedSongs = [];
-    var chaningCurrentTime = false;
-    var after_pause = false;
-    var song_playing = false;
-    var audio_val = localStorage.getItem("audio_val");
+    let selectedSongs = [];
+    let chaningCurrentTime = false;
+    let after_pause = false;
+    let song_playing = false;
+    let audio_val = localStorage.getItem("audio_val");
     
-    var audioSrc;
-    var audio;
-    var prev_song;
-    var countDown;
+    let audioSrc;
+    let audio;
+    let prev_song;
+    let countDown;
 
     function onTrackMovement(e){
         chaningCurrentTime = true;
@@ -54,9 +54,9 @@ const AudioPlayer = props => {
     }
 
     function count_time(song_duration){
-        var current_time;
-        var currentTime_humanized;
-        var totalTime_humanized;
+        let current_time;
+        let currentTime_humanized;
+        let totalTime_humanized;
         countDown = setInterval(function() {
             if (song_playing){
                 current_time = audio.currentTime
@@ -71,8 +71,8 @@ const AudioPlayer = props => {
     }
 
     async function setAudio(url){
-        var audio_size;
-        var kbit;
+        let audio_size;
+        let kbit;
         await fetch(url).then( resp =>{
             resp.headers.forEach((value, key) => {
                 if (key === "content-length"){
@@ -85,8 +85,8 @@ const AudioPlayer = props => {
         audio.volume = audio_val;
         audio.preload = "auto";
         audio.onloadedmetadata = function(){
-            var song_duration = audio.duration;
-            var song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
+            let song_duration = audio.duration;
+            let song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
             bitrate.innerHTML = song_bitrate+" kbps";
             track.max = song_duration;
             clearInterval(countDown)
@@ -102,6 +102,8 @@ const AudioPlayer = props => {
             duration.innerHTML = "";
             track.disabled = true;
             track.value = track.max = 0;
+            song_playing = false;
+            prev_song = null;
        });
     }
 
@@ -156,7 +158,7 @@ const AudioPlayer = props => {
     }
 
     function songClicked(e){
-        var song = e.target;
+        let song = e.target;
         if (song.tagName !== "DIV"){
             if (song === selectedSongs[0]){
                 audioSrc = song.getAttribute("link");
