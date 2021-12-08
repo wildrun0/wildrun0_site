@@ -1,13 +1,23 @@
 import os
 import sys
 from datetime import datetime, timezone
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, make_response
+from flask_cors import CORS
 from pathlib import Path
 
 UPLOAD_FOLDER = os.path.abspath(os.path.dirname(sys.argv[0]))+"/files/"
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+CORS(app, expose_headers=["md5-hash"])
+
+import hashlib
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 def sizeof_fmt(num, suffix="B"):
     for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
@@ -17,6 +27,7 @@ def sizeof_fmt(num, suffix="B"):
     return f"{num:.1f}Yi{suffix}"
 
 tz = datetime.now(timezone.utc).astimezone().tzinfo #pc timezone
+
 def get_advanced_files_info(_root, files):
     file_info = []
     for file in files:
@@ -38,6 +49,7 @@ def list_folder(path):
     for i in os.listdir(path):
         files.append(i)
     return files
+
 def tree_dir(startpath):
     paths = []
     for root, dirs, files in os.walk(startpath):
@@ -48,13 +60,12 @@ def tree_dir(startpath):
 
         paths.append((_root, dirs_modified, files_modified))
     return paths
+
 @app.route("/files", methods=["GET"])
 def list_files():
     files = tree_dir(app.config['UPLOAD_FOLDER'])
 
     response = jsonify(files)
-    response.headers.add('Access-Control-Allow-Origin', "*") #в будущем заменить на https://wildrun0.dev
-
     return response
 
 @app.route("/files/music", methods=["GET"])
@@ -62,15 +73,16 @@ def list_music():
     files = list_folder(app.config['UPLOAD_FOLDER']+"/music/")
 
     response = jsonify(files)
-    response.headers.add('Access-Control-Allow-Origin', "*") #в будущем заменить на https://wildrun0.dev
     return response
 
 @app.route('/files/<path:file>', methods=["GET"])
 def send_file(file):
-    response = send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True)
-    response.headers.add('Access-Control-Allow-Origin', "*") #в будущем заменить на https://wildrun0.dev
+    response = make_response(send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True))
+    
+    filepath = os.path.normpath(app.config["UPLOAD_FOLDER"]+file)
+    md5_file_hash = md5(filepath)
+    response.headers['md5-hash'] =  md5_file_hash
     return response
 
-
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=1337, debug=True)
+    app.run(host="192.168.0.101", port=1337, debug=True)

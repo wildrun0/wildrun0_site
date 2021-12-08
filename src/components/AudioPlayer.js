@@ -4,8 +4,8 @@ import './styles/AudioPlayer.css';
 
 import yandhiCover from '../icons/programms_stuff/yandhi.mp4';
 
-// не забудь поменять айпи здесь и в fileserver.py
 const api_addr = process.env.REACT_APP_API_ADDRESS;
+var storedSongs = {};
 
 const AudioPlayer = props => {
     const [error, setError] = useState(null);
@@ -16,7 +16,8 @@ const AudioPlayer = props => {
     const bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
     const duration = document.getElementsByClassName("musicPlayer_duration")[0];
     const track = document.getElementsByClassName("musicTrack")[0];
-    useEffect(() => {
+    var audio = document.getElementsByClassName("musicPlayer_audio")[0];
+    useEffect(() =>{
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
         .then(
@@ -29,24 +30,23 @@ const AudioPlayer = props => {
         )
     }, [])
 
-    function reset_animation() {
+    function reset_animation(){
         let el = document.getElementsByClassName("musicPlayer_trackName")[0];
         el.style.animation = 'none';
-        el.getClientRects(); //forces layout / reflow (хуй знает как перевести)
-        el.style.animation = null; 
+        window.requestAnimationFrame(function(){
+            el.style.animation = 'slide-left 20s linear infinite';
+        });
     }
-
     let selectedSongs = [];
     let chaningCurrentTime = false;
     let after_pause = false;
     let song_playing = false;
-    let audio_val = localStorage.getItem("audio_val");
+    let audio_val = localStorage.getItem("audio_val") || 0.25;
     
     let audioSrc;
-    let audio;
     let prev_song;
     let countDown;
-
+    
     function onTrackMovement(e){
         chaningCurrentTime = true;
         audio.currentTime = e.target.value;
@@ -57,7 +57,7 @@ const AudioPlayer = props => {
         let current_time;
         let currentTime_humanized;
         let totalTime_humanized;
-        countDown = setInterval(function() {
+        countDown = setInterval(function(){
             if (song_playing){
                 current_time = audio.currentTime
                 currentTime_humanized = new Date(current_time * 1000).toISOString().substr(14, 5);
@@ -71,19 +71,44 @@ const AudioPlayer = props => {
     }
 
     async function setAudio(url){
-        let audio_size;
+        let headers;
         let kbit;
+        let audioBlob;
+        let response_blob;
+        let fileHash;
         await fetch(url).then( resp =>{
-            resp.headers.forEach((value, key) => {
-                if (key === "content-length"){
-                    audio_size = value;
-                }
-            })
-            kbit = audio_size/128;
+            headers = Object.fromEntries(resp.headers.entries())
+            kbit = headers['content-length']/128;
+            response_blob = resp.blob()
         })
-        audio = new Audio(url);
+        fileHash = headers['md5-hash']
+        console.log(storedSongs[fileHash])
+        if (storedSongs[fileHash] !== undefined){
+            let blobURL = URL.createObjectURL(storedSongs[fileHash])
+            audioBlob = blobURL;
+        }else{
+            await response_blob.then(blob =>{
+                storedSongs[fileHash] = blob;
+                let blobURL = URL.createObjectURL(blob)
+                audioBlob = blobURL
+            })
+        }
+        if(!audio.canPlayType(headers['content-type'])){
+            return false;
+        }
+        audio.src = audioBlob;
+        audio.type = headers['content-type']
         audio.volume = audio_val;
         audio.preload = "auto";
+        cover.play();
+
+        audio.play();
+        track.disabled = false;
+        track.addEventListener("mousedown", (e) =>{
+            chaningCurrentTime = true;
+        })
+        track.addEventListener('change', onTrackMovement, true)
+
         audio.onloadedmetadata = function(){
             let song_duration = audio.duration;
             let song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
@@ -92,7 +117,7 @@ const AudioPlayer = props => {
             clearInterval(countDown)
             count_time(song_duration)
         }
-        audio.addEventListener("ended", function(){
+        function handleAudioEnd(e){
             audio.currentTime = 0;
             cover.pause();
             cover.currentTime = 0;
@@ -104,7 +129,9 @@ const AudioPlayer = props => {
             track.value = track.max = 0;
             song_playing = false;
             prev_song = null;
-       });
+        }
+        audio.removeEventListener("ended", handleAudioEnd)
+        audio.addEventListener("ended", handleAudioEnd)
     }
 
     async function play_music(song){
@@ -116,7 +143,6 @@ const AudioPlayer = props => {
             title.style.animationPlayState = "running";
             after_pause = false;
         }
-        cover.play();
         song_playing = true;
         if (prev_song !== song){
             try{
@@ -124,18 +150,7 @@ const AudioPlayer = props => {
             } catch {}
             await setAudio(audioSrc)
         }
-        try{
-            audio.play();
-        } catch (err){
-            console.log(err)
-        }
-        track.disabled = false;
         prev_song = song;
-        track.addEventListener("mousedown", (e) =>{
-            chaningCurrentTime = true;
-        })
-        track.addEventListener('change', onTrackMovement, true)
-
     }
 
     function pauseSong(){
@@ -195,13 +210,14 @@ const AudioPlayer = props => {
     }
 
     if (error){
-        try{
-            document.getElementsByClassName("musicPlayer_songsList")[0].innerHTML = "UNABLE TO FETCH SONGS"
-        } catch {}
+        let songsList_div = document.getElementsByClassName("musicPlayer_songsList")[0]
+        songsList_div.innerHTML = "<p class = 'unableFetch'>UNABLE TO FETCH SONGS</p>";
+        songsList_div.style.display = "flex"
     }
     return(
         <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} onclose={() => closeHandle(props)} saveCoords={true}>
             <div className = "musicPlayer_grid">
+                <audio className = "musicPlayer_audio" />
                 <div className="musicPlayer_cover">
                     <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
                         <source src={yandhiCover + "#t=0.1"} type="video/mp4" />
@@ -234,7 +250,7 @@ const AudioPlayer = props => {
                         <div className="field-row">
                             <label htmlFor="range22">Volume:</label>
                             <label htmlFor="range23">Low</label>
-                            <input id="range23" type="range" min="1" max="100" defaultValue = {localStorage.getItem("audio_val")*100} onChange={changeVolume} />
+                            <input id="range23" type="range" min="1" max="100" defaultValue = {localStorage.getItem("audio_val")*100 || 25} onChange={changeVolume} />
                             <label htmlFor="range24">High</label>
                         </div>
                     </div>
@@ -244,4 +260,4 @@ const AudioPlayer = props => {
     )
 }
 
-export default AudioPlayer
+export default AudioPlayer;

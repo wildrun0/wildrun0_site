@@ -70,7 +70,7 @@ const WindowsDiv = props => {
         <Draggable defaultPosition={to_apply} bounds={window.innerWidth < 500 ? "body":"html"} handle = {"." + handler} onStart={() => props.drag}>
             <div className={props.className}>
                 <div className="window">
-                    <div className="title-bar" onMouseUp={teleport_end}>
+                    <div className="title-bar" onMouseUp={teleport_end} onTouchEnd={teleport_end}>
                         <div className="title-bar-text">{props.title}</div>
                         <div className="title-bar-controls" style={{display: props.enableControls ? "":"none"}}>
                             <button aria-label="Minimize" onClick={() => handleMinimize(props.className)} />
