@@ -295,12 +295,14 @@ const AudioPlayer = props => {
     }
 
     if (error){
-        let songsList_div = document.getElementsByClassName("musicPlayer_songsList")[0]
-        songsList_div.innerHTML = "<p class = 'unableFetch'>UNABLE TO FETCH SONGS</p>";
-        songsList_div.style.display = "flex"
+        try{ // порой, в закрытое уже окно плеера может прилететь еррор и будет пиздец
+            let songsList_div = document.getElementsByClassName("musicPlayer_songsList")[0]
+            songsList_div.innerHTML = "<p class = 'unableFetch'>UNABLE TO FETCH SONGS</p>";
+            songsList_div.style.display = "flex"
+        } catch {}
     }
     return(
-        <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} onclose={() => closeHandle(props)} saveCoords={true}>
+        <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} onclose={() => closeHandle(props)}>
             <div className = "musicPlayer_grid">
                 <audio className = "musicPlayer_audio" />
                 <div className="musicPlayer_cover">

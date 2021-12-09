@@ -45,7 +45,6 @@ function handleMaximize(div){
 }
 const WindowsDiv = props => {
     let to_apply = {}
-    let handler = "title-bar";
 
     function teleport_end(e){
         if (e.target.tagName !== "BUTTON"){
@@ -67,7 +66,7 @@ const WindowsDiv = props => {
     }
 
     return(
-        <Draggable defaultPosition={to_apply} bounds={window.innerWidth < 500 ? "body":"html"} handle = {"." + handler} onStart={() => props.drag}>
+        <Draggable defaultPosition={to_apply} bounds={window.innerWidth < 500 ? "body":"html"} handle = ".title-bar" onStart={() => props.drag}>
             <div className={props.className}>
                 <div className="window">
                     <div className="title-bar" onMouseUp={teleport_end} onTouchEnd={teleport_end}>
@@ -82,7 +81,7 @@ const WindowsDiv = props => {
                                         handleClose(props.className)
                                     }
                                     if(props.onclose !== undefined){
-                                        props.onclose(true)
+                                        props.onclose()
                                     }
                             }}/>
                         </div>
