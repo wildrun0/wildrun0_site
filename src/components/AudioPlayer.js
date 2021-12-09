@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { openDB } from 'idb'
+import { openDB, deleteDB } from 'idb'
 import WindowsDiv from './WindowsDiv';
 import './styles/AudioPlayer.css';
 
@@ -8,6 +8,7 @@ import yandhiCover from '../icons/programms_stuff/yandhi.mp4';
 const api_addr = process.env.REACT_APP_API_ADDRESS;
 
 let db_init = false;
+let update_required = false;
 const dbName = 'songsDb'
 const storeName = 'songs'
 const version = 1 //versions start at 1
@@ -32,7 +33,20 @@ async function get_cached_song(key){
     const item = await db.transaction(storeName).objectStore(storeName).get(key)
     return item
 }
+async function delete_db(name){
+    await deleteDB(name)
+}
+
+// конвертируем шаги в гиги
+document.addEventListener("touchstart", e =>{
+    e.target.dispatchEvent(new MouseEvent("mousedown"))
+})
+
 const AudioPlayer = props => {
+    if (update_required){
+        delete_db(dbName)
+        update_required = false;
+    }
     if (!db_init){
         init_db()
         db_init = true;
@@ -46,7 +60,7 @@ const AudioPlayer = props => {
     const bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
     const duration = document.getElementsByClassName("musicPlayer_duration")[0];
     const track = document.getElementsByClassName("musicTrack")[0];
-    let audio = document.getElementsByClassName("musicPlayer_audio")[0];
+    const audio = document.getElementsByClassName("musicPlayer_audio")[0];
     useEffect(() =>{
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
@@ -78,7 +92,6 @@ const AudioPlayer = props => {
     let countDown;
     
     function onTrackMovement(e){
-        chaningCurrentTime = true;
         audio.currentTime = e.target.value;
         chaningCurrentTime = false;
     }
@@ -100,73 +113,107 @@ const AudioPlayer = props => {
         }, 500);
     }
 
-    async function setAudio(url, song_hash){
+    async function setAudio(url, song_hash, song_element){
         let headers;
         let kbit;
         let audioBlob;
         let response_blob;
         let songType;
+        let song_duration;
+        let song_bitrate;
 
-        if (await get_cached_song(song_hash)){
-            let storedSong = await get_cached_song(song_hash)
-            kbit = storedSong[0];
-            songType = storedSong[1]
-            audioBlob = URL.createObjectURL(storedSong[2]);
-            console.log("stored from cache")
+        let cached_song = await get_cached_song(song_hash);
+        let toCache = [];
+        if (cached_song){
+            song_duration = cached_song[0];
+            song_bitrate = cached_song[1];
+            songType = cached_song[2]['type']
 
+            audioBlob = URL.createObjectURL(cached_song[2]);
+
+            console.log("recovered from cache")
         } else{
             await fetch(url).then(resp =>{
                 headers = Object.fromEntries(resp.headers.entries())
-                songType = headers['content-type']
                 kbit = headers['content-length']/128;
-                response_blob = resp.blob()
+                response_blob = resp.blob();
             })
             await response_blob.then(blob =>{
-                let blobURL = URL.createObjectURL(blob)
-                audioBlob = blobURL
-                cache_song(song_hash, [kbit, songType, blob])
-                console.log("song not stored, saving now...")
+                let blobURL = URL.createObjectURL(blob);
+                songType = blob['type'];
+                audioBlob = blobURL;
+                toCache.push(blob)
             })
+            console.log("song not stored, saving now...");
         }
-        if(!audio.canPlayType(songType)){
+        if(audio.canPlayType(songType) === ""){
+            console.warn("UNSUPPORTABLE TYPE: "+songType)
             return false;
         }
         audio.src = audioBlob;
-        audio.type = songType;
         audio.volume = audio_val;
         audio.preload = "auto";
-
         audio.play();
-        track.disabled = false;
-        track.addEventListener("mousedown", (e) =>{
-            chaningCurrentTime = true;
-        })
-        track.addEventListener('change', onTrackMovement, true)
 
-        audio.onloadedmetadata = function(){
-            let song_duration = audio.duration;
-            let song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
-            bitrate.innerHTML = song_bitrate+" kbps";
-            track.max = song_duration;
+        function handleTrackMovement(){
+            chaningCurrentTime = true
+        }
+        
+        track.disabled = false;
+        track.addEventListener("mousedown", handleTrackMovement);
+        track.addEventListener('change', onTrackMovement, true)
+        
+        audio.onloadedmetadata = () => {
+            if (!cached_song){
+                song_duration = audio.duration;
+                song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
+
+                toCache.splice(0,0, song_duration);
+                toCache.splice(1,0, song_bitrate)
+                cache_song(song_hash, toCache)
+            }
+
             clearInterval(countDown)
             count_time(song_duration)
-            cover.play();
+
+            bitrate.innerHTML = song_bitrate+" kbps";
+            track.max = song_duration;
         }
-        function handleAudioEnd(e){
+        cover.play();
+
+        audio.onended = () => {
             audio.currentTime = 0;
+
             cover.pause();
             cover.currentTime = 0;
+
             title.innerHTML = ""
             bitrate.innerHTML = "";
+
             clearInterval(countDown);
+
             duration.innerHTML = "";
+
             track.disabled = true;
             track.value = track.max = 0;
+
             song_playing = false;
             prev_song = null;
+
+            let next_song = song_element.nextSibling
+
+            if (next_song !== null){
+                if (selectedSongs.length > 0){
+                    selectedSongs[0].className = "";
+                }
+                next_song.className = "clicked"
+
+                selectedSongs.pop()
+                selectedSongs.push(next_song)
+
+                setSong(next_song, next_song.getAttribute("data-key"))
+            }
         }
-        audio.removeEventListener("ended", handleAudioEnd)
-        audio.addEventListener("ended", handleAudioEnd)
     }
 
     async function play_music(song, song_hash){
@@ -185,7 +232,7 @@ const AudioPlayer = props => {
             try{
                 audio.pause();
             } catch {}
-            await setAudio(audioSrc, song_hash)
+            await setAudio(audioSrc, song_hash, song)
         }
         prev_song = song;
     }
@@ -201,7 +248,7 @@ const AudioPlayer = props => {
         }
     }
 
-    function setSong(name, song_hash){
+    function setSong(name){
         if (!song_playing && selectedSongs.length > 0){
             let song_hash = name.getAttribute("data-key")
             audioSrc = name.getAttribute("link");
