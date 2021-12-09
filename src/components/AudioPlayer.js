@@ -1,13 +1,43 @@
 import React, {useEffect, useState} from 'react';
+import { openDB } from 'idb'
 import WindowsDiv from './WindowsDiv';
 import './styles/AudioPlayer.css';
 
 import yandhiCover from '../icons/programms_stuff/yandhi.mp4';
 
 const api_addr = process.env.REACT_APP_API_ADDRESS;
-var storedSongs = {};
 
+let db_init = false;
+const dbName = 'songsDb'
+const storeName = 'songs'
+const version = 1 //versions start at 1
+async function init_db(){
+    await openDB(dbName, version,{
+        upgrade(db, oldVersion, newVersion, transaction) {
+            db.createObjectStore(storeName)
+        }
+    })
+}
+async function cache_song(songName, params){
+    const db = await openDB(dbName)
+
+    const tx = db.transaction(storeName, 'readwrite')
+    const store = await tx.objectStore(storeName)
+  
+    await store.put(params, songName)
+    await tx.done
+}
+async function get_cached_song(key){
+    const db = await openDB(dbName)
+    const item = await db.transaction(storeName).objectStore(storeName).get(key)
+    return item
+}
 const AudioPlayer = props => {
+    if (!db_init){
+        init_db()
+        db_init = true;
+        console.log("DB initialized")
+    }
     const [error, setError] = useState(null);
     const [items, setItems] = useState([]);
 
@@ -16,7 +46,7 @@ const AudioPlayer = props => {
     const bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
     const duration = document.getElementsByClassName("musicPlayer_duration")[0];
     const track = document.getElementsByClassName("musicTrack")[0];
-    var audio = document.getElementsByClassName("musicPlayer_audio")[0];
+    let audio = document.getElementsByClassName("musicPlayer_audio")[0];
     useEffect(() =>{
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
@@ -70,37 +100,41 @@ const AudioPlayer = props => {
         }, 500);
     }
 
-    async function setAudio(url){
+    async function setAudio(url, song_hash){
         let headers;
         let kbit;
         let audioBlob;
         let response_blob;
-        let fileHash;
-        await fetch(url).then( resp =>{
-            headers = Object.fromEntries(resp.headers.entries())
-            kbit = headers['content-length']/128;
-            response_blob = resp.blob()
-        })
-        fileHash = headers['md5-hash']
-        console.log(storedSongs[fileHash])
-        if (storedSongs[fileHash] !== undefined){
-            let blobURL = URL.createObjectURL(storedSongs[fileHash])
-            audioBlob = blobURL;
-        }else{
+        let songType;
+
+        if (await get_cached_song(song_hash)){
+            let storedSong = await get_cached_song(song_hash)
+            kbit = storedSong[0];
+            songType = storedSong[1]
+            audioBlob = URL.createObjectURL(storedSong[2]);
+            console.log("stored from cache")
+
+        } else{
+            await fetch(url).then(resp =>{
+                headers = Object.fromEntries(resp.headers.entries())
+                songType = headers['content-type']
+                kbit = headers['content-length']/128;
+                response_blob = resp.blob()
+            })
             await response_blob.then(blob =>{
-                storedSongs[fileHash] = blob;
                 let blobURL = URL.createObjectURL(blob)
                 audioBlob = blobURL
+                cache_song(song_hash, [kbit, songType, blob])
+                console.log("song not stored, saving now...")
             })
         }
-        if(!audio.canPlayType(headers['content-type'])){
+        if(!audio.canPlayType(songType)){
             return false;
         }
         audio.src = audioBlob;
-        audio.type = headers['content-type']
+        audio.type = songType;
         audio.volume = audio_val;
         audio.preload = "auto";
-        cover.play();
 
         audio.play();
         track.disabled = false;
@@ -116,6 +150,7 @@ const AudioPlayer = props => {
             track.max = song_duration;
             clearInterval(countDown)
             count_time(song_duration)
+            cover.play();
         }
         function handleAudioEnd(e){
             audio.currentTime = 0;
@@ -134,7 +169,7 @@ const AudioPlayer = props => {
         audio.addEventListener("ended", handleAudioEnd)
     }
 
-    async function play_music(song){
+    async function play_music(song, song_hash){
         if (!after_pause){
             cover.pause();
             cover.currentTime = 0;
@@ -142,13 +177,15 @@ const AudioPlayer = props => {
         } else{
             title.style.animationPlayState = "running";
             after_pause = false;
+            audio.play();
+            cover.play();
         }
         song_playing = true;
         if (prev_song !== song){
             try{
                 audio.pause();
             } catch {}
-            await setAudio(audioSrc)
+            await setAudio(audioSrc, song_hash)
         }
         prev_song = song;
     }
@@ -164,11 +201,12 @@ const AudioPlayer = props => {
         }
     }
 
-    function setSong(name){
+    function setSong(name, song_hash){
         if (!song_playing && selectedSongs.length > 0){
+            let song_hash = name.getAttribute("data-key")
             audioSrc = name.getAttribute("link");
             title.innerHTML = name.textContent;
-            play_music(name)
+            play_music(name, song_hash)
         }
     }
 
@@ -229,8 +267,10 @@ const AudioPlayer = props => {
                     <div className = "musicPlayer_songsList" onClick={songClicked}>
                         {
                             items.map((song) =>{
+                                let hash = song[1]
+                                let song_name = song[0]
                                 return(
-                                    <p key={song.hashCode()}link={api_addr+"/files/music/"+song}> {song} </p>
+                                    <p data-key={hash} key={hash} link={api_addr+"/files/music/"+song_name}> {song_name} </p>
                                 )
                             })
                         }
