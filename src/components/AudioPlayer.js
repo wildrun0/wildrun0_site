@@ -37,11 +37,236 @@ async function delete_db(name){
     await deleteDB(name)
 }
 
-// конвертируем шаги в гиги
-document.addEventListener("touchstart", e =>{
-    e.target.dispatchEvent(new MouseEvent("mousedown"))
-})
+let cover
+let title
+let bitrate
+let duration
+let track
+let audio
+function reset_animation(){
+    let el = document.getElementsByClassName("musicPlayer_trackName")[0];
+    el.style.animation = 'none';
+    window.requestAnimationFrame(function(){
+        el.style.animation = 'slide-left 20s linear infinite';
+    });
+}
+let selectedSongs = [];
+let chaningCurrentTime = false;
+let after_pause = false;
+let song_playing = false;
+let audio_val = localStorage.getItem("audio_val") || 0.25;
 
+let audioSrc;
+let prev_song;
+let countDown;
+
+function onTrackMovement(e){
+    audio.currentTime = e.target.value;
+    chaningCurrentTime = false;
+}
+
+function count_time(song_duration){
+    let current_time;
+    let currentTime_humanized;
+    let totalTime_humanized;
+    countDown = setInterval(function(){
+        if (song_playing){
+            current_time = audio.currentTime
+            currentTime_humanized = new Date(current_time * 1000).toISOString().substr(14, 5);
+            totalTime_humanized = new Date(song_duration * 1000).toISOString().substr(14, 5);
+            duration.innerHTML = currentTime_humanized + " / " + totalTime_humanized;
+            if (!chaningCurrentTime){
+                track.value = current_time;
+            }
+        }
+    }, 500);
+}
+
+function handleTrackMovement(){
+    chaningCurrentTime = true
+}
+
+async function setAudio(url, song_hash, song_element){
+    let headers;
+    let kbit;
+    let audioBlob;
+    let response_blob;
+    let songType;
+    let song_duration;
+    let song_bitrate;
+
+    let cached_song = await get_cached_song(song_hash);
+    let toCache = [];
+    if (cached_song){
+        song_duration = cached_song[0];
+        song_bitrate = cached_song[1];
+        songType = cached_song[2]['type']
+
+        audioBlob = URL.createObjectURL(cached_song[2]);
+
+        console.log("recovered from cache")
+    } else{
+        await fetch(url).then(resp =>{
+            headers = Object.fromEntries(resp.headers.entries())
+            kbit = headers['content-length']/128;
+            response_blob = resp.blob();
+        })
+        await response_blob.then(blob =>{
+            let blobURL = URL.createObjectURL(blob);
+            songType = blob['type'];
+            audioBlob = blobURL;
+            toCache.push(blob)
+        })
+        console.log("song not stored, saving now...");
+    }
+    if(audio.canPlayType(songType) === ""){
+        console.warn("UNSUPPORTABLE TYPE: "+songType)
+        return false;
+    }
+
+    audio.src = audioBlob;
+    audio.volume = audio_val;
+    audio.preload = "auto";
+    audio.play();
+    
+    track.disabled = false;
+
+    function load_metadata(){
+        if (!cached_song){
+            song_duration = audio.duration;
+            song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
+
+            toCache.splice(0,0, song_duration);
+            toCache.splice(1,0, song_bitrate)
+            cache_song(song_hash, toCache)
+        }
+
+        clearInterval(countDown)
+        count_time(song_duration)
+
+        bitrate.innerHTML = song_bitrate+" kbps";
+        track.max = song_duration;
+    }
+    audio.addEventListener("loadedmetadata", load_metadata);
+    track.addEventListener("mousedown", handleTrackMovement);
+    track.addEventListener('change', onTrackMovement);
+    cover.play();
+
+    audio.onended = () => {
+        audio.currentTime = 0;
+
+        cover.pause();
+        cover.currentTime = 0;
+
+        title.innerHTML = ""
+        bitrate.innerHTML = "";
+
+        clearInterval(countDown);
+
+        duration.innerHTML = "";
+
+        track.disabled = true;
+        track.value = track.max = 0;
+
+        song_playing = false;
+        prev_song = null;
+
+        let next_song = song_element.nextSibling
+
+        if (next_song !== null){
+            if (selectedSongs.length > 0){
+                selectedSongs[0].className = "";
+            }
+            next_song.className = "clicked"
+
+            selectedSongs.pop()
+            selectedSongs.push(next_song)
+
+            setSong(next_song, next_song.getAttribute("data-key"))
+        }
+    }
+}
+
+async function play_music(song, song_hash){
+    if (!after_pause){
+        cover.pause();
+        cover.currentTime = 0;
+        reset_animation();
+    } else{
+        title.style.animationPlayState = "running";
+        after_pause = false;
+        audio.play();
+        cover.play();
+    }
+    song_playing = true;
+    if (prev_song !== song){
+        try{
+            audio.pause();
+        } catch {}
+        await setAudio(audioSrc, song_hash, song)
+    }
+    prev_song = song;
+}
+
+function pauseSong(){
+    if (song_playing){
+        cover.pause();
+        title.style.animationPlayState = "paused";
+        title.innerHTML = "PAUSED: " + title.innerHTML;
+        audio.pause();
+        song_playing = false;
+        after_pause = true;
+    }
+}
+
+function setSong(name){
+    if (!song_playing && selectedSongs.length > 0){
+        let song_hash = name.getAttribute("data-key")
+        audioSrc = name.getAttribute("link");
+        title.innerHTML = name.textContent;
+        play_music(name, song_hash)
+    }
+}
+
+function songClicked(e){
+    let song = e.target;
+    if (song.tagName !== "DIV"){
+        if (song === selectedSongs[0]){
+            audioSrc = song.getAttribute("link");
+            if (!song_playing){
+                setSong(song);
+            }
+        } else{
+            song_playing = false;
+            if (selectedSongs.length > 0){
+                selectedSongs[0].className = "";
+            }
+            song.className = "clicked"
+            selectedSongs.pop()
+            selectedSongs.push(song)
+        }
+    }
+}
+
+function changeVolume(e){
+    audio_val = (e.target.value*0.01);
+    audio_val = audio_val <= 0.05 ? audio_val - 0.01: audio_val; // делаем значения от 0.00 до 1.00
+    localStorage.setItem("audio_val", audio_val)
+    try{
+        audio.volume = audio_val;
+    } catch {}
+}
+
+function closeHandle(props){
+    props.onclose(props.id)
+    try{
+        audio.pause();
+        audio.currentTime = 0;
+    } catch {}
+}
+function touchToMouse(e){
+    e.target.dispatchEvent(new MouseEvent("mousedown"))
+}
 const AudioPlayer = props => {
     if (update_required){
         delete_db(dbName)
@@ -55,12 +280,16 @@ const AudioPlayer = props => {
     const [error, setError] = useState(null);
     const [items, setItems] = useState([]);
 
-    const cover = document.getElementsByClassName("musicPlayer_coverTag")[0];
-    const title = document.getElementsByClassName("musicPlayer_trackName")[0];
-    const bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
-    const duration = document.getElementsByClassName("musicPlayer_duration")[0];
-    const track = document.getElementsByClassName("musicTrack")[0];
-    const audio = document.getElementsByClassName("musicPlayer_audio")[0];
+    cover = document.getElementsByClassName("musicPlayer_coverTag")[0];
+    title = document.getElementsByClassName("musicPlayer_trackName")[0];
+    bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
+    duration = document.getElementsByClassName("musicPlayer_duration")[0];
+    track = document.getElementsByClassName("musicTrack")[0];
+    audio = document.getElementsByClassName("musicPlayer_audio")[0];
+
+    // конвертируем шаги в гиги
+    document.addEventListener("touchstart", touchToMouse)
+
     useEffect(() =>{
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
@@ -73,226 +302,6 @@ const AudioPlayer = props => {
           }
         )
     }, [])
-
-    function reset_animation(){
-        let el = document.getElementsByClassName("musicPlayer_trackName")[0];
-        el.style.animation = 'none';
-        window.requestAnimationFrame(function(){
-            el.style.animation = 'slide-left 20s linear infinite';
-        });
-    }
-    let selectedSongs = [];
-    let chaningCurrentTime = false;
-    let after_pause = false;
-    let song_playing = false;
-    let audio_val = localStorage.getItem("audio_val") || 0.25;
-    
-    let audioSrc;
-    let prev_song;
-    let countDown;
-    
-    function onTrackMovement(e){
-        audio.currentTime = e.target.value;
-        chaningCurrentTime = false;
-    }
-
-    function count_time(song_duration){
-        let current_time;
-        let currentTime_humanized;
-        let totalTime_humanized;
-        countDown = setInterval(function(){
-            if (song_playing){
-                current_time = audio.currentTime
-                currentTime_humanized = new Date(current_time * 1000).toISOString().substr(14, 5);
-                totalTime_humanized = new Date(song_duration * 1000).toISOString().substr(14, 5);
-                duration.innerHTML = currentTime_humanized + " / " + totalTime_humanized;
-                if (!chaningCurrentTime){
-                    track.value = current_time;
-                }
-            }
-        }, 500);
-    }
-
-    async function setAudio(url, song_hash, song_element){
-        let headers;
-        let kbit;
-        let audioBlob;
-        let response_blob;
-        let songType;
-        let song_duration;
-        let song_bitrate;
-
-        let cached_song = await get_cached_song(song_hash);
-        let toCache = [];
-        if (cached_song){
-            song_duration = cached_song[0];
-            song_bitrate = cached_song[1];
-            songType = cached_song[2]['type']
-
-            audioBlob = URL.createObjectURL(cached_song[2]);
-
-            console.log("recovered from cache")
-        } else{
-            await fetch(url).then(resp =>{
-                headers = Object.fromEntries(resp.headers.entries())
-                kbit = headers['content-length']/128;
-                response_blob = resp.blob();
-            })
-            await response_blob.then(blob =>{
-                let blobURL = URL.createObjectURL(blob);
-                songType = blob['type'];
-                audioBlob = blobURL;
-                toCache.push(blob)
-            })
-            console.log("song not stored, saving now...");
-        }
-        if(audio.canPlayType(songType) === ""){
-            console.warn("UNSUPPORTABLE TYPE: "+songType)
-            return false;
-        }
-        audio.src = audioBlob;
-        audio.volume = audio_val;
-        audio.preload = "auto";
-        audio.play();
-
-        function handleTrackMovement(){
-            chaningCurrentTime = true
-        }
-        
-        track.disabled = false;
-        track.addEventListener("mousedown", handleTrackMovement);
-        track.addEventListener('change', onTrackMovement, true)
-        
-        audio.onloadedmetadata = () => {
-            if (!cached_song){
-                song_duration = audio.duration;
-                song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
-
-                toCache.splice(0,0, song_duration);
-                toCache.splice(1,0, song_bitrate)
-                cache_song(song_hash, toCache)
-            }
-
-            clearInterval(countDown)
-            count_time(song_duration)
-
-            bitrate.innerHTML = song_bitrate+" kbps";
-            track.max = song_duration;
-        }
-        cover.play();
-
-        audio.onended = () => {
-            audio.currentTime = 0;
-
-            cover.pause();
-            cover.currentTime = 0;
-
-            title.innerHTML = ""
-            bitrate.innerHTML = "";
-
-            clearInterval(countDown);
-
-            duration.innerHTML = "";
-
-            track.disabled = true;
-            track.value = track.max = 0;
-
-            song_playing = false;
-            prev_song = null;
-
-            let next_song = song_element.nextSibling
-
-            if (next_song !== null){
-                if (selectedSongs.length > 0){
-                    selectedSongs[0].className = "";
-                }
-                next_song.className = "clicked"
-
-                selectedSongs.pop()
-                selectedSongs.push(next_song)
-
-                setSong(next_song, next_song.getAttribute("data-key"))
-            }
-        }
-    }
-
-    async function play_music(song, song_hash){
-        if (!after_pause){
-            cover.pause();
-            cover.currentTime = 0;
-            reset_animation();
-        } else{
-            title.style.animationPlayState = "running";
-            after_pause = false;
-            audio.play();
-            cover.play();
-        }
-        song_playing = true;
-        if (prev_song !== song){
-            try{
-                audio.pause();
-            } catch {}
-            await setAudio(audioSrc, song_hash, song)
-        }
-        prev_song = song;
-    }
-
-    function pauseSong(){
-        if (song_playing){
-            cover.pause();
-            title.style.animationPlayState = "paused";
-            title.innerHTML = "PAUSED: " + title.innerHTML;
-            audio.pause();
-            song_playing = false;
-            after_pause = true;
-        }
-    }
-
-    function setSong(name){
-        if (!song_playing && selectedSongs.length > 0){
-            let song_hash = name.getAttribute("data-key")
-            audioSrc = name.getAttribute("link");
-            title.innerHTML = name.textContent;
-            play_music(name, song_hash)
-        }
-    }
-
-    function songClicked(e){
-        let song = e.target;
-        if (song.tagName !== "DIV"){
-            if (song === selectedSongs[0]){
-                audioSrc = song.getAttribute("link");
-                if (!song_playing){
-                    setSong(song);
-                }
-            } else{
-                song_playing = false;
-                if (selectedSongs.length > 0){
-                    selectedSongs[0].className = "";
-                }
-                song.className = "clicked"
-                selectedSongs.pop()
-                selectedSongs.push(song)
-            }
-        }
-    }
-
-    function changeVolume(e){
-        audio_val = (e.target.value*0.01);
-        audio_val = audio_val <= 0.05 ? audio_val - 0.01: audio_val; // делаем значения от 0.00 до 1.00
-        localStorage.setItem("audio_val", audio_val)
-        try{
-            audio.volume = audio_val;
-        } catch {}
-    }
-
-    function closeHandle(props){
-        props.onclose(props.id)
-        try{
-            audio.pause();
-            audio.currentTime = 0;
-        } catch {}
-    }
 
     if (error){
         try{ // порой, в закрытое уже окно плеера может прилететь еррор и будет пиздец
