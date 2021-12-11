@@ -1,20 +1,22 @@
 import os
 import sys
+import hashlib
+
 from datetime import datetime, timezone
-from flask import Flask, send_from_directory, jsonify, make_response
+from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
 from pathlib import Path
 from dotenv import dotenv_values
 
 config = dict(dotenv_values("../.env"))
 config_ip, config_port = config["REACT_APP_API_ADDRESS"].split('://')[1:][0].split(":")
+
 UPLOAD_FOLDER = os.path.abspath(os.path.dirname(sys.argv[0]))+"/files/"
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-CORS(app, expose_headers=["md5-hash"])
+CORS(app)
 
-import hashlib
 def md5(fname):
     hash_md5 = hashlib.md5()
     with open(fname, "rb") as f:
@@ -47,6 +49,7 @@ def get_advanced_files_info(_root, files):
 
         file_info.append([file, last_modified_date, file_size]) 
     return file_info
+
 def list_folder(path, check_md5=False):
     files = []
     for i in os.listdir(path):
@@ -70,22 +73,16 @@ def tree_dir(startpath):
 @app.route("/files", methods=["GET"])
 def list_files():
     files = tree_dir(app.config['UPLOAD_FOLDER'])
-
-    response = jsonify(files)
-    return response
+    return jsonify(files)
 
 @app.route("/files/music", methods=["GET"])
 def list_music():
     files = list_folder(app.config['UPLOAD_FOLDER']+"/music/", check_md5=True)
-
-    response = jsonify(files)
-    return response
+    return jsonify(files)
 
 @app.route('/files/<path:file>', methods=["GET"])
-def send_file(file):
-    response = make_response(send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True))
-    
-    return response
+def send_file(file):    
+    return send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(host=config_ip, port=config_port, debug=True)

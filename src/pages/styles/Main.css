@@ -110,11 +110,3 @@ blockquote{
     user-select: none;
     -khtml-user-select: none;
 }
-.iconAuthorStyle{
-    opacity: 0.5;
-    width: fit-content;
-    z-index: -1;
-    position: absolute;
-    text-align: center;
-    width: 100%;
-}

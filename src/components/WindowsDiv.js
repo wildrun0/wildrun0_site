@@ -1,11 +1,11 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Draggable from 'react-draggable';
 
 let pageWidth  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 let pageHeight = window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
 
 pageHeight = pageHeight - 6;
-console.warn(pageHeight)
+
 // конвертирует touch-нажатия в click для совместимости
 // touchend вместо touchstart чтобы отрабатывать точнее
 var touchmove;
@@ -25,64 +25,21 @@ document.addEventListener("touchstart", (e) =>{
 })
 
 let div_params = {}
-function handleMinimize(div, have_rights){
-    if (have_rights){
-        let div_element = document.getElementsByClassName(div)[0]
 
-    }
-}
-function handleMaximize(div, have_rights){
-    if (have_rights){
-        let div_element = document.getElementsByClassName(div)[0]
-        
-        if (div_params[div]){
-            // приводим окно в прошлый вид
-            let params = div_params[div];
-            div_element.style.cssText = `
-                position: ${params[0]}; 
-                top: ${params[1]};
-                left: ${params[2]};
-                transform: ${params[3]};
-                width: ${params[4]};
-                z-index: ${params[5]};
-            `;
-            div_element.getElementsByClassName("window")[0].style.height = params[6]
-            delete div_params[div]
-        } else{
-            console.log("maximizing now")
-            div_params[div] = [
-                div_element.style.position, div_element.style.top, 
-                div_element.style.left, div_element.style.transform, 
-                div_element.style.width, div_element.getElementsByClassName("window")[0].style.height,
-                div_element.style.zIndex
-            ];
-            div_element.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                transform: none;
-                width: ${pageWidth}px;
-                z-index: 999;
-            `;
-            div_element.getElementsByClassName("window")[0].style.height = pageHeight+"px";
-        }
-    }
-}
 const WindowsDiv = props => {
     const [render, setRender] = useState(true);
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
-
     let to_apply = {}
     let is_draggable = props.drag || false;
     let have_rights = true;
     // запрещаем расширять окна с ошибками т.к. уродство
-    if (props.className === "error"){
+    if (props.className.includes("error")){
         have_rights = false;
     }
     useEffect(() => {
         function handleResize(e){
             pageWidth  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             pageHeight = window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
+            pageHeight = pageHeight - 6;
         }
         window.addEventListener('resize', handleResize);
         return () =>{
@@ -107,7 +64,56 @@ const WindowsDiv = props => {
         to_apply["x"] = 0;
         to_apply["y"] = 0;
     }
-
+    function handleMinimize(div, have_rights){
+        if (have_rights){
+            let div_element = document.getElementsByClassName(div)[0]
+    
+        }
+    }
+    function handleMaximize(div, have_rights, props){
+        if (have_rights){
+            let div_element = document.getElementsByClassName(div)[0]
+            
+            if (div_params[div]){
+                // приводим окно в прошлый вид
+                let params = div_params[div];
+                div_element.style.cssText = `
+                    position: ${params[0]}; 
+                    top: ${params[1]};
+                    left: ${params[2]};
+                    transform: ${params[3]};
+                    width: ${params[4]};
+                    z-index: ${params[5]};
+                `;
+                div_element.getElementsByClassName("window")[0].style.height = params[6]
+                delete div_params[div]
+                if (props.onResize !== undefined){
+                    props.onResize('unmaximize', div_element)
+                }
+                is_draggable = props.drag || false;
+            } else{
+                div_params[div] = [
+                    div_element.style.position, div_element.style.top, 
+                    div_element.style.left, div_element.style.transform, 
+                    div_element.style.width, div_element.getElementsByClassName("window")[0].style.height,
+                    div_element.style.zIndex
+                ];
+                div_element.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    transform: none;
+                    width: ${pageWidth}px;
+                    z-index: 995;
+                `;
+                div_element.getElementsByClassName("window")[0].style.height = pageHeight+"px";
+                if (props.onResize !== undefined){
+                    props.onResize('maximize', div_element)
+                }
+                is_draggable = false;
+            }
+        }
+    }
     return(
         <React.Fragment>
             {render && (
@@ -117,13 +123,14 @@ const WindowsDiv = props => {
                             <div className="title-bar" onMouseUp={teleport_end} onTouchEnd={teleport_end}>
                                 <div className="title-bar-text">{props.title}</div>
                                 <div className="title-bar-controls" style={{display: props.enableControls ? "":"none"}}>
-                                    <button aria-label="Minimize" onClick={() => handleMinimize(props.className, have_rights)} />
-                                    <button aria-label="Maximize" onClick={() => handleMaximize(props.className, have_rights)} />
+                                    <button aria-label="Minimize" onClick={() => handleMinimize(props.className, have_rights, props)} />
+                                    <button aria-label="Maximize" onClick={() => handleMaximize(props.className, have_rights, props)} />
                                     <button aria-label="Close" onClick={() =>{
                                             setRender(false)
                                             if(props.onclose !== undefined){
                                                 props.onclose()
                                             }
+                                            delete div_params[props.className]
                                     }}/>
                                 </div>
                             </div>

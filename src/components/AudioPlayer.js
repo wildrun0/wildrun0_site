@@ -313,6 +313,13 @@ const AudioPlayer = props => {
         closeHandle(props);
         setRender(false)
     }
+    function appendResizeClass(event, div){
+        if (event === 'maximize'){
+            div.classList.add("maximized")
+        } else{
+            div.classList.remove("maximized")
+        }
+    }
     return(
         <React.Fragment>
             {error && (
@@ -321,14 +328,12 @@ const AudioPlayer = props => {
                 </WindowsError>
             )}
             {isRender && (
-                <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} onclose={closeComponent} drag={true}>
+                <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} drag={true} onclose={closeComponent} onResize={appendResizeClass}>
                     <div className = "musicPlayer_grid">
                         <audio className = "musicPlayer_audio" />
-                        <div className="musicPlayer_cover">
-                            <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
-                                <source src={yandhiCover + "#t=0.1"} type="video/mp4" />
-                            </video>
-                        </div>
+                        <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
+                            <source src={yandhiCover + "#t=0.1"} type="video/mp4" />
+                        </video>
                         <div className = "musicPlayer_player">
                             <p className = "musicPlayer_currentlyPlaying"> Currently playing </p>
                             <div className = "musicPlayer_trackNameDiv"> <p className = "musicPlayer_trackName"></p> </div>

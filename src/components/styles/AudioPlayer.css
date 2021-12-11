@@ -1,20 +1,27 @@
 .musicPlayer_window{
     position: relative;
 }
-.musicPlayer_cover video{
+.musicPlayer_coverTag{
     height: auto 
 }
 .musicPlayer_player{
     display: grid;
 }
 @media (max-width:500px){
+    .exp_container .maximized .musicPlayer_songsList{
+        height: 90%;
+    }
+    .exp_container .maximized .musicPlayer_trackNameDiv{
+        margin-top: 5px;
+        margin-bottom: 10px;
+    }
     .musicPlayer_window{
         width: 350px;
     }
     .musicPlayer_grid{
-        grid-template-rows: 1fr 1fr;
+        grid-template-rows: 0fr 1fr;
     }
-    .musicPlayer_cover video{
+    .musicPlayer_coverTag{
         max-width: 70%; 
         margin: 0 auto;
         display: block
@@ -69,21 +76,68 @@
     zoom: 0.9;
 }
 @media (min-width:501px){
+    .exp_container .maximized .window-body{
+        margin: 0;  
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 96%;
+    }
+    .exp_container .maximized .musicPlayer_grid{
+        grid-template-columns: min-content 1fr;
+        grid-gap: 15px;
+        justify-content: center;
+    }
+    .exp_container .maximized .musicPlayer_player{
+        width: 850px;
+    }
+    .exp_container .maximized .musicPlayer_currentlyPlaying{
+        font-size: 22px;
+        margin: auto;
+        height: fit-content;
+    }
+    .exp_container .maximized .musicPlayer_trackNameDiv{
+        height: 30px;
+    }
+    .exp_container .maximized .musicPlayer_songsList{
+        height: 275px;
+    }
+    .exp_container .maximized .musicPlayer_playBtn{
+        width: 150px;
+        height: 35px;
+    }
+    .exp_container .maximized .musicPlayer_pauseBtn{
+        width: 150px;
+        height: 35px;
+    }
+    .exp_container .maximized .musicPlayer_bitrate{
+        width: 90px;
+    }
+    .exp_container .maximized .musicPlayer_coverTag{
+        max-width:435px;
+    }
+    .exp_container .maximized .pause{
+        margin-right: 45%;
+        margin-left: 45%;
+    }
+    .exp_container .maximized .musicPlayer_duration{
+        padding-top: 10px;
+    }
     .musicPlayer_window{
         width: 435px;
     }
     .musicPlayer_grid{
         grid-template-columns: 1fr 1fr;
     }
-    .musicPlayer_cover video{
-        max-width: 100%; 
+    .musicPlayer_coverTag{
+        min-width: 204px;
+        max-width: 50%;
     }
     .musicPlayer_trackNameDiv{
         height: 12px;
         padding: 2px;
     }
     .musicPlayer_songsList{
-        width: 96%;
         height: 74px;
     }
     .musicPlayer_playBtn, .musicPlayer_pauseBtn{
@@ -132,7 +186,6 @@
     font-family: 'Microsoft Sans Serif';
     overflow-x: scroll;
     white-space: nowrap;
-    width: 96.5%;
     margin: 0;
 }
 .musicPlayer_trackNameDiv::-webkit-scrollbar{
