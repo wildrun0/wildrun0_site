@@ -48,7 +48,7 @@ var has_loaded = false
 const FileManager = props => {
     if (!has_loaded){
         current_path = props.startPath;
-        api_addr = props.api_address;
+        api_addr = props.download_link;
         has_loaded = true;
     }
     const defaultPath = props.startPath;
@@ -179,7 +179,7 @@ const FileManager = props => {
     return (
         <div className="container files">
             <WindowsDiv title="File Manager" className="fileManagerDiv" enableControls={true}>
-                <div>
+                <div className='filemanager_wrapper'>
                     <div className="title-path">
                         <button type="button" disabled>Address</button>
                         <div className="pathDiv">

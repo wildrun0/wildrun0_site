@@ -1,17 +1,7 @@
-.error{
-    width: 350px;
-    margin: auto;
-    z-index:999;
-}
 .loading {
     text-align: center;
     font-size: 15px;
 }
-.loading-error-body {
-    display: grid;
-    height: 50px;
-    grid-template-columns: 30px 1fr;
-}
-.loading-error-body p{
-    margin: auto 10px auto;
+.fileError .error{
+    position: relative;
 }

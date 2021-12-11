@@ -1,26 +1,23 @@
-import React, {useReducer} from 'react';
+import React, {useReducer, useState} from 'react';
 import WindowsDiv from '../components/WindowsDiv';
 import WindowsIcon from '../components/WindowsIcon';
 import AudioPlayer from '../components/AudioPlayer';
 
 import './styles/Experimental.css'
 import MusicIcon from '../icons/cdPlayer.png'
-import errorPng from '../icons/error.png'
+import WindowsError from '../components/WindowsError';
 
 var programms_started = {}
 var programms_started_names = []
 const Experimental = () => {
+    const [error, setError] = useState(false)
     const [, forceUpdate] = useReducer(x => x + 1, 0);
     // тута выбираем и отправляем в массив нужную "программу"
-    function handle_error_closing(e){
-        e.style.visibility = "hidden";
-    }
     function handleClose(id, name){
         delete programms_started[id]
         programms_started_names = programms_started_names.filter(e => e !== name)
     }
     function handle(_, name){
-        const errordiv = document.getElementsByClassName("error")[0]
         let programm_content;
         let uniq_id = Date.now() / 1000 | 0 + Math.random();
         if (name === "Music Player"){
@@ -34,7 +31,7 @@ const Experimental = () => {
                 programms_started_names.push(name)
                 forceUpdate();
             } else{
-                errordiv.style.visibility = "unset"
+                setError(true)
             }
         }
     }
@@ -49,12 +46,11 @@ const Experimental = () => {
                     </div>
                 </div>
             </WindowsDiv>
-            <WindowsDiv title="PROGRAMM SYSTEM ERROR" className="error" drag={true} enableControls={true} handleClose={handle_error_closing}>
-                <div className="loading-error-body">
-                    <img src={errorPng} alt="Error"></img>
-                    <p>Error happend: programm already started</p>
-                </div>
-            </WindowsDiv>
+            {error && (
+                <WindowsError title="PROGRAMM ERROR" drag={true} enableControls={true} onclose={() => setError(false)}>
+                    <p> Programm already started </p>
+                </WindowsError>
+            ) }
             {   // отрисовываем запущенные "программы"
                 Object.keys(programms_started).map(function(key, index) {
                     return React.cloneElement(programms_started[key])

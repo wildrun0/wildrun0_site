@@ -81,7 +81,7 @@ const Main = () => {
                         <MediaButton href="https://vk.com/wildrun0" SOCIAL_LOGO_NAME={vk_logo} text="VK"></MediaButton>
                     </p>
                     <p className="status-bar-field">
-                        <MediaButton href="https://instagram.com/wildrun0" SOCIAL_LOGO_NAME={inst_logo} text="INSTAGRAM"></MediaButton>
+                        <MediaButton href="https://instagram.com/wildrun0/" SOCIAL_LOGO_NAME={inst_logo} text="INSTAGRAM"></MediaButton>
                     </p>
                 </div>
             </WindowsDiv>

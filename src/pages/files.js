@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import FileManager from '../components/FileManager';
-import WindowsDiv from '../components/WindowsDiv';
+import WindowsError from '../components/WindowsError';
 
-import errorPng from '../icons/error.png';
 import './styles/Files.css'
 
 const api_addr = process.env.REACT_APP_API_ADDRESS;
@@ -27,20 +26,19 @@ const Files = () => {
     }, [])
     if (error) {
         return(
-            <WindowsDiv title="FILE SYSTEM ERROR" className="error" drag={false}>
-                <div className="loading-error-body">
-                    <img src={errorPng} alt="Error"></img>
+            <div className="fileError">
+                <WindowsError title="FILE SYSTEM ERROR" drag={false}>
                     <p><b>Error happend: {error.message}.</b> This was probably caused because of internal server error or 
                     server unavailability. Try to refresh the page</p>
-                </div>
-            </WindowsDiv>
+                </WindowsError>
+            </div>
         )
     } else if (!isLoaded) {
         return <p className="loading">Loading...</p>;
     } else {
         return (
-            <FileManager api_address={api_addr} files={items} startPath="/files"/>
+            <FileManager download_link={api_addr} files={items} startPath="/files"/>
         );
     }
 }
-export default Files
+export default Files;

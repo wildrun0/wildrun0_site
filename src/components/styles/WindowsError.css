@@ -1,0 +1,14 @@
+.error{
+    width: 350px;
+    margin: auto;
+    z-index:999;
+    position: absolute;
+}
+.loading-error-body {
+    display: grid;
+    height: 50px;
+    grid-template-columns: 30px 1fr;
+}
+.loading-error-body p{
+    margin: auto 10px 30px;
+}

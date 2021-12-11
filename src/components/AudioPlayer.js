@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import { openDB, deleteDB } from 'idb'
 import WindowsDiv from './WindowsDiv';
 import './styles/AudioPlayer.css';
-
 import yandhiCover from '../icons/programms_stuff/yandhi.mp4';
+import WindowsError from './WindowsError';
 
 const api_addr = process.env.REACT_APP_API_ADDRESS;
 
@@ -267,6 +267,7 @@ function closeHandle(props){
 function touchToMouse(e){
     e.target.dispatchEvent(new MouseEvent("mousedown"))
 }
+
 const AudioPlayer = props => {
     if (update_required){
         delete_db(dbName)
@@ -278,6 +279,7 @@ const AudioPlayer = props => {
         console.log("DB initialized")
     }
     const [error, setError] = useState(null);
+    const [isRender, setRender] = useState(true)
     const [items, setItems] = useState([]);
 
     cover = document.getElementsByClassName("musicPlayer_coverTag")[0];
@@ -301,60 +303,70 @@ const AudioPlayer = props => {
             setError(error);
           }
         )
+        return () =>{
+            // на выходе очищаем счетчик
+            clearInterval(countDown)
+        }
     }, [])
-
-    if (error){
-        try{ // порой, в закрытое уже окно плеера может прилететь еррор и будет пиздец
-            let songsList_div = document.getElementsByClassName("musicPlayer_songsList")[0]
-            songsList_div.innerHTML = "<p class = 'unableFetch'>UNABLE TO FETCH SONGS</p>";
-            songsList_div.style.display = "flex"
-        } catch {}
+    function closeComponent(){
+        setError(false)
+        closeHandle(props);
+        setRender(false)
     }
     return(
-        <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} onclose={() => closeHandle(props)}>
-            <div className = "musicPlayer_grid">
-                <audio className = "musicPlayer_audio" />
-                <div className="musicPlayer_cover">
-                    <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
-                        <source src={yandhiCover + "#t=0.1"} type="video/mp4" />
-                    </video>
-                </div>
-                <div className = "musicPlayer_player">
-                    <p className = "musicPlayer_currentlyPlaying"> Currently playing </p>
-                    <div className = "musicPlayer_trackNameDiv"> <p className = "musicPlayer_trackName"></p> </div>
-                    <div className = "musicPlayer_songsList" onClick={songClicked}>
-                        {
-                            items.map((song) =>{
-                                let hash = song[1]
-                                let song_name = song[0]
-                                return(
-                                    <p data-key={hash} key={hash} link={api_addr+"/files/music/"+song_name}> {song_name} </p>
-                                )
-                            })
-                        }
-                    </div>
-                    <div className = "musicPlayer_musicTrack">
-                        <div className="field-row">
-                            <input id="range25" className="has-box-indicator musicTrack" type="range" defaultValue = "0" disabled/>
+        <React.Fragment>
+            {error && (
+                <WindowsError title="MUSIC PLAYER ERROR" enableControls={true} drag={true} onclose={closeComponent}>
+                    <p> ERROR: {error.message} </p>
+                </WindowsError>
+            )}
+            {isRender && (
+                <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} onclose={closeComponent} drag={true}>
+                    <div className = "musicPlayer_grid">
+                        <audio className = "musicPlayer_audio" />
+                        <div className="musicPlayer_cover">
+                            <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
+                                <source src={yandhiCover + "#t=0.1"} type="video/mp4" />
+                            </video>
+                        </div>
+                        <div className = "musicPlayer_player">
+                            <p className = "musicPlayer_currentlyPlaying"> Currently playing </p>
+                            <div className = "musicPlayer_trackNameDiv"> <p className = "musicPlayer_trackName"></p> </div>
+                            <div className = "musicPlayer_songsList" onClick={songClicked}>
+                                {
+                                    items.map((song) =>{
+                                        let hash = song[1];
+                                        let song_name = song[0];
+                                        return(
+                                            <p data-key={hash} key={hash} link={api_addr+"/files/music/"+song_name}> {song_name} </p>
+                                        )
+                                    })
+                                }
+                            </div>
+                            <div className = "musicPlayer_musicTrack">
+                                <div className="field-row">
+                                    <input id="range25" className="has-box-indicator musicTrack" type="range" defaultValue = "0" disabled/>
+                                </div>
+                            </div>
+                            <div className="musicPlayer_controls">
+                                <button className="musicPlayer_playBtn" onClick={() => setSong(selectedSongs[0])}><div className = "play" /></button>
+                                <button className="musicPlayer_pauseBtn" onClick={pauseSong}><div className = "pause" /></button>
+                                <button className="musicPlayer_bitrate" disabled></button>
+                                <blockquote className="musicPlayer_duration"></blockquote>
+                            </div>
+                            <div className = "musicPlayer_volume">
+                                <div className="field-row">
+                                    <label htmlFor="range22">Volume:</label>
+                                    <label htmlFor="range23">Low</label>
+                                    <input id="range23" type="range" min="1" max="100" defaultValue = {localStorage.getItem("audio_val")*100 || 25} onChange={changeVolume} />
+                                    <label htmlFor="range24">High</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div className="musicPlayer_controls">
-                        <button className="musicPlayer_playBtn" onClick={() => setSong(selectedSongs[0])}><div className = "play" /></button>
-                        <button className="musicPlayer_pauseBtn" onClick={pauseSong}><div className = "pause" /></button>
-                        <button className="musicPlayer_bitrate" disabled></button>
-                        <blockquote className="musicPlayer_duration"></blockquote>
-                    </div>
-                    <div className = "musicPlayer_volume">
-                        <div className="field-row">
-                            <label htmlFor="range22">Volume:</label>
-                            <label htmlFor="range23">Low</label>
-                            <input id="range23" type="range" min="1" max="100" defaultValue = {localStorage.getItem("audio_val")*100 || 25} onChange={changeVolume} />
-                            <label htmlFor="range24">High</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </WindowsDiv>
+                </WindowsDiv>
+            )}
+        </React.Fragment>
     )
 }
 

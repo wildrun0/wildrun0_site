@@ -5,7 +5,16 @@
     grid-gap:0;
 }
 .fileManagerDiv .window-body{
-    margin:0;
+    margin: 0;
+    height: 95%;
+}
+.filemanager_wrapper{
+    display: grid;
+    height: 99%;
+    grid-template-rows: 0fr 0fr 1fr;
+}
+hr{
+    width: 100%;
 }
 .pathDiv {
     display: flex;
@@ -39,7 +48,6 @@
 .filesList{
     font-weight: normal;
     font-style: normal;
-    
     margin-left: 20px;
     margin-right: 20px;
     overflow-y: auto;
@@ -47,6 +55,8 @@
     flex-direction: column;
     list-style-type: none;
     padding: 0;
+    margin-top: 0;
+    height: 100%;
 }
 .fileListElement:active, .fileListElement:focus{
     outline: none;
@@ -73,7 +83,8 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    width:250px;
+    width: 250px;
+    letter-spacing: 0.015em;
 }
 .fileCreateDate{
     letter-spacing: 0.02em;
@@ -91,11 +102,8 @@
     .fileManagerDiv{
         width: 550px;
     }
-    .fileManagerDiv .window-body{
+    .fileManagerDiv .window{
         height: var(--div-height);
-    }
-    .filesList{
-        max-height: calc(var(--div-height) - 75px);
     }
     .fileLiElement {
         width:99%;
@@ -108,11 +116,8 @@
     .fileManagerDiv{
         width: 100%;
     }
-    .fileManagerDiv .window-body{
-        height: 100%;
-    }
-    .filesList{
-        height: 360px;
+    .fileManagerDiv .window{
+        height: var(--div-height);
     }
     .fileListElement p{
         width: 150px;
