@@ -90,7 +90,7 @@ const WindowsDiv = props => {
                 div_element.classList.remove("maximized");
                 is_draggable = props.drag || false;
                 if (props.onResize !== undefined){
-                    props.onResize('unmaximize', div_element)
+                    props.onResize('unmaximized', div_element)
                 }
             } else{
                 div_params[div] = [
