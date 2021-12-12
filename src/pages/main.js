@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import MediaButton from '../components/MediaButton';
 import WindowsDiv from '../components/WindowsDiv';
 
@@ -12,55 +12,80 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+let first_run = false;
+
+const defaultX = 350;
+const defaultY = 350;
+
+let sizeX = defaultX;
+let sizeY = defaultY;
+
+let pixelRatio = window.devicePixelRatio;
 const Main = () => {
+    const [rerender, setRerender] = useState(false);
+    if (!first_run){
+        first_run = true;
+    }
+    function change_resolution(action, e){
+        if (action === "maximized"){
+            sizeX = e.offsetWidth - 25;
+            sizeY = e.offsetHeight - 48;
+        } else{
+            sizeX = defaultX;
+            sizeY = defaultY;
+        }
+        pixelRatio = window.devicePixelRatio;
+        setRerender(true);
+    }
+    
     useEffect(() => {
-        const scene = new THREE.Scene()
-        const camera = new THREE.PerspectiveCamera(90, 500 / 500, 0.1, 1000)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(90, 500 / 500, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({
             canvas: document.querySelector("#bg")
         })
         const loader = new GLTFLoader();
-        const controls = new OrbitControls(camera, renderer.domElement)
+        const controls = new OrbitControls(camera, renderer.domElement);
         
-        renderer.setPixelRatio(window.devicePixelRatio)
-        renderer.setSize(350, 350)
-        camera.position.setZ(30)
-
-        const pointLight = new THREE.PointLight(0xfffffff)
-        pointLight.position.set(5,-10, 5)
-
-        const directionalLight = new THREE.DirectionalLight(0xfffffff, 3)
-        directionalLight.position.set(0,-50,0)
-
-        const ambientLight = new THREE.AmbientLight(0xfffffff)
-        scene.add(pointLight, directionalLight, ambientLight)
-
-        const skyTexture = new THREE.TextureLoader().load('sky.jpeg')
-        scene.background = skyTexture
-
-        let model = new THREE.Object3D()
+        renderer.setPixelRatio(pixelRatio);
+        renderer.setSize(sizeX, sizeY);
+        camera.position.setZ(30);
+    
+        const pointLight = new THREE.PointLight(0xfffffff);
+        pointLight.position.set(5,-10, 5);
+    
+        const directionalLight = new THREE.DirectionalLight(0xfffffff, 3);
+        directionalLight.position.set(0,-50,0);
+    
+        const ambientLight = new THREE.AmbientLight(0xfffffff);
+        scene.add(pointLight, directionalLight, ambientLight);
+    
+        const skyTexture = new THREE.TextureLoader().load('sky.jpeg');
+        scene.background = skyTexture;
+    
+        let model = new THREE.Object3D();
         loader.load('ebasos/scene.gltf', function (gltf) {
-            const alex = gltf.scene.children[0]
-            model = alex
+            const alex = gltf.scene.children[0];
+            model = alex;
 
-            model.scale.set(7,7,7)
-            model.position.set(0,-20,0)
-
+            model.scale.set(7,7,7);
+            model.position.set(0,-20,0);
+    
             scene.add(gltf.scene);
             renderer.render(scene, camera);
         }, undefined, function (error) {
             console.error(error);
         });
-
+    
         const animate = () => {
-            requestAnimationFrame(animate)
-            model.rotation.z += 0.004
-            controls.update()
-            renderer.render(scene, camera)
+            requestAnimationFrame(animate);
+            model.rotation.z += 0.004;
+            controls.update();
+            renderer.render(scene, camera);
         }
-
-        animate()
-    });
+        animate();
+        setRerender(false);
+    }, [rerender]);
     return(
         <div className="container">
             <WindowsDiv title="About wildrun0" className="info-container" drag={true} enableControls={true}>  
@@ -85,7 +110,7 @@ const Main = () => {
                     </p>
                 </div>
             </WindowsDiv>
-            <WindowsDiv title="3D MODEL" className="model-container" drag={true} enableControls={true}>
+            <WindowsDiv title="3D MODEL" className="model-container" drag={true} enableControls={true} onResize={change_resolution}>
                 <canvas id="bg" />
             </WindowsDiv>
         </div>

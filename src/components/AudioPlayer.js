@@ -313,13 +313,6 @@ const AudioPlayer = props => {
         closeHandle(props);
         setRender(false)
     }
-    function appendResizeClass(event, div){
-        if (event === 'maximize'){
-            div.classList.add("maximized")
-        } else{
-            div.classList.remove("maximized")
-        }
-    }
     return(
         <React.Fragment>
             {error && (
@@ -328,7 +321,7 @@ const AudioPlayer = props => {
                 </WindowsError>
             )}
             {isRender && (
-                <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} drag={true} onclose={closeComponent} onResize={appendResizeClass}>
+                <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} drag={true} onclose={closeComponent}>
                     <div className = "musicPlayer_grid">
                         <audio className = "musicPlayer_audio" />
                         <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
@@ -357,7 +350,9 @@ const AudioPlayer = props => {
                                 <button className="musicPlayer_playBtn" onClick={() => setSong(selectedSongs[0])}><div className = "play" /></button>
                                 <button className="musicPlayer_pauseBtn" onClick={pauseSong}><div className = "pause" /></button>
                                 <button className="musicPlayer_bitrate" disabled></button>
-                                <blockquote className="musicPlayer_duration"></blockquote>
+                                <blockquote>
+                                    <p className="musicPlayer_duration" ></p>
+                                </blockquote>
                             </div>
                             <div className = "musicPlayer_volume">
                                 <div className="field-row">

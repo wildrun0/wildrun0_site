@@ -87,10 +87,11 @@ const WindowsDiv = props => {
                 `;
                 div_element.getElementsByClassName("window")[0].style.height = params[6]
                 delete div_params[div]
+                div_element.classList.remove("maximized");
+                is_draggable = props.drag || false;
                 if (props.onResize !== undefined){
                     props.onResize('unmaximize', div_element)
                 }
-                is_draggable = props.drag || false;
             } else{
                 div_params[div] = [
                     div_element.style.position, div_element.style.top, 
@@ -107,10 +108,11 @@ const WindowsDiv = props => {
                     z-index: 995;
                 `;
                 div_element.getElementsByClassName("window")[0].style.height = pageHeight+"px";
-                if (props.onResize !== undefined){
-                    props.onResize('maximize', div_element)
-                }
+                div_element.classList.add('maximized');
                 is_draggable = false;
+                if (props.onResize !== undefined){
+                    props.onResize('maximized', div_element)
+                }
             }
         }
     }

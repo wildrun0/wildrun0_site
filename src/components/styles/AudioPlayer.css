@@ -9,11 +9,15 @@
 }
 @media (max-width:500px){
     .exp_container .maximized .musicPlayer_songsList{
-        height: 90%;
+        height: 350px;
     }
     .exp_container .maximized .musicPlayer_trackNameDiv{
         margin-top: 5px;
         margin-bottom: 10px;
+    }
+    .exp_container .maximized .musicPlayer_musicTrack{
+        padding-top: 15px;
+        padding-bottom: 15px;
     }
     .musicPlayer_window{
         width: 350px;
@@ -55,9 +59,6 @@
         height: 100%;
         width: 75px;
         color: #c0c0c0;
-    }
-    .musicPlayer_duration{
-        padding-top: 8.5px;
     }
     @keyframes slide-left {
         from {
@@ -120,9 +121,6 @@
         margin-right: 45%;
         margin-left: 45%;
     }
-    .exp_container .maximized .musicPlayer_duration{
-        padding-top: 10px;
-    }
     .musicPlayer_window{
         width: 435px;
     }
@@ -154,9 +152,6 @@
     }
     .musicPlayer_bitrate{
         width: 55px;
-    }
-    .musicPlayer_duration{
-        padding-top: 6px;
     }
     @keyframes slide-left {
         from {
@@ -235,6 +230,13 @@
     grid-template-columns: 0fr 0fr 0fr 1fr;
     height: fit-content;
 }
+.musicPlayer_controls blockquote{
+    background: #dfdfdf;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    display: flex;
+}
 .musicPlayer_bitrate{
     color:black;
     min-width: auto;
@@ -243,11 +245,9 @@
     text-shadow: none !important;
 }
 .musicPlayer_duration{
-    background: #dfdfdf;
-    margin: 0;
-    display: block;
-    width: 100%;
     text-align: center;
+    height: auto;
+    margin: auto;
 }
 .musicPlayer_musicTrack{
     padding-top: 5px;
