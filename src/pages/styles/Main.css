@@ -13,16 +13,10 @@ body{
 #bg{
     cursor:grab;
 }
-.info-container .status-bar{
-     width:335px;
-}
 @media (max-width:500px){
     .about-main p{
         font-size: 13px;
         font-family: "W95FA", sans-serif;
-    }
-    .iconAuthorStyle{
-        bottom: -200px;
     }
     body{
         height:100vh;
@@ -49,9 +43,6 @@ body{
         font-size: 15px;
         font-family: "W95FA", sans-serif;
     }
-    .iconAuthorStyle{
-        bottom:0;
-    }
     .info-container{
         width:650px;
     }
@@ -68,7 +59,7 @@ body{
 }
 .about-grid{
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 0fr 1fr;
     grid-gap:10px;
 }
 .about-main blockquote {

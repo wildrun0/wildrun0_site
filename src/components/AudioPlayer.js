@@ -46,8 +46,15 @@ let audio
 function reset_animation(){
     let el = document.getElementsByClassName("musicPlayer_trackName")[0];
     el.style.animation = 'none';
+    let animation;
+    let parentClasses = document.getElementsByClassName("musicPlayer_window")[0].classList;
+    if (parentClasses.contains("maximized")){
+        animation = 'slide-left-maximized 20s linear infinite';
+    } else{
+        animation = 'slide-left 20s linear infinite';
+    }
     window.requestAnimationFrame(function(){
-        el.style.animation = 'slide-left 20s linear infinite';
+        el.style.animation = animation;
     });
 }
 let selectedSongs = [];
@@ -64,22 +71,22 @@ function onTrackMovement(e){
     audio.currentTime = e.target.value;
     chaningCurrentTime = false;
 }
-
+function setTrack(current_time, currentTime_humanized, totalTime_humanized, song_duration){
+    if (song_playing){
+        current_time = audio.currentTime
+        currentTime_humanized = new Date(current_time * 1000).toISOString().substr(14, 5);
+        totalTime_humanized = new Date(song_duration * 1000).toISOString().substr(14, 5);
+        duration.innerHTML = currentTime_humanized + " / " + totalTime_humanized;
+        if (!chaningCurrentTime){
+            track.value = current_time;
+        }
+    }
+}
 function count_time(song_duration){
     let current_time;
     let currentTime_humanized;
     let totalTime_humanized;
-    countDown = setInterval(function(){
-        if (song_playing){
-            current_time = audio.currentTime
-            currentTime_humanized = new Date(current_time * 1000).toISOString().substr(14, 5);
-            totalTime_humanized = new Date(song_duration * 1000).toISOString().substr(14, 5);
-            duration.innerHTML = currentTime_humanized + " / " + totalTime_humanized;
-            if (!chaningCurrentTime){
-                track.value = current_time;
-            }
-        }
-    }, 500);
+    countDown = setInterval(setTrack, 500, current_time, currentTime_humanized, totalTime_humanized, song_duration);
 }
 
 function handleTrackMovement(){
@@ -97,6 +104,7 @@ async function setAudio(url, song_hash, song_element){
 
     let cached_song = await get_cached_song(song_hash);
     let toCache = [];
+    let lost_connection;
     if (cached_song){
         song_duration = cached_song[0];
         song_bitrate = cached_song[1];
@@ -110,7 +118,18 @@ async function setAudio(url, song_hash, song_element){
             headers = Object.fromEntries(resp.headers.entries())
             kbit = headers['content-length']/128;
             response_blob = resp.blob();
-        })
+        }).then(
+            (result) => {
+                console.log(result)
+                lost_connection = false;
+            },
+            (error) => {
+                lost_connection = true;
+            }
+          )
+        if (lost_connection){
+            return;
+        }
         await response_blob.then(blob =>{
             let blobURL = URL.createObjectURL(blob);
             songType = blob['type'];
@@ -121,7 +140,7 @@ async function setAudio(url, song_hash, song_element){
     }
     if(audio.canPlayType(songType) === ""){
         console.warn("UNSUPPORTABLE TYPE: "+songType)
-        return false;
+        return;
     }
 
     audio.src = audioBlob;
@@ -131,16 +150,18 @@ async function setAudio(url, song_hash, song_element){
     
     track.disabled = false;
 
-    function load_metadata(){
+    async function load_metadata(){
         if (!cached_song){
+            console.log("caching", url)
             song_duration = audio.duration;
             song_bitrate = Math.ceil(Math.round(kbit/song_duration)/16)*16;
 
             toCache.splice(0,0, song_duration);
-            toCache.splice(1,0, song_bitrate)
-            cache_song(song_hash, toCache)
+            toCache.splice(1,0, song_bitrate);
+            await cache_song(song_hash, toCache);
+            cached_song = true;
+            audio.removeEventListener("loadedmetadata", load_metadata);
         }
-
         clearInterval(countDown)
         count_time(song_duration)
 
@@ -148,8 +169,7 @@ async function setAudio(url, song_hash, song_element){
         track.max = song_duration;
     }
     audio.addEventListener("loadedmetadata", load_metadata);
-    track.addEventListener("mousedown", handleTrackMovement);
-    track.addEventListener('change', onTrackMovement);
+    
     cover.play();
 
     audio.onended = () => {
@@ -282,17 +302,21 @@ const AudioPlayer = props => {
     const [isRender, setRender] = useState(true)
     const [items, setItems] = useState([]);
 
-    cover = document.getElementsByClassName("musicPlayer_coverTag")[0];
-    title = document.getElementsByClassName("musicPlayer_trackName")[0];
-    bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
-    duration = document.getElementsByClassName("musicPlayer_duration")[0];
-    track = document.getElementsByClassName("musicTrack")[0];
-    audio = document.getElementsByClassName("musicPlayer_audio")[0];
-
+    
     // конвертируем шаги в гиги
-    document.addEventListener("touchstart", touchToMouse)
-
+    
     useEffect(() =>{
+        cover = document.getElementsByClassName("musicPlayer_coverTag")[0];
+        title = document.getElementsByClassName("musicPlayer_trackName")[0];
+        bitrate = document.getElementsByClassName("musicPlayer_bitrate")[0];
+        duration = document.getElementsByClassName("musicPlayer_duration")[0];
+        track = document.getElementsByClassName("musicTrack")[0];
+        audio = document.getElementsByClassName("musicPlayer_audio")[0];
+        
+        track.addEventListener("mousedown", handleTrackMovement);
+        track.addEventListener('change', onTrackMovement);
+        document.addEventListener("touchstart", touchToMouse)
+
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
         .then(
@@ -305,13 +329,19 @@ const AudioPlayer = props => {
         )
         return () =>{
             // на выходе очищаем счетчик
-            clearInterval(countDown)
+            clearInterval(countDown);
+            track.removeEventListener("mousedown", handleTrackMovement);
+            track.removeEventListener('change', onTrackMovement);
+            document.removeEventListener("touchstart", touchToMouse)
         }
     }, [])
     function closeComponent(){
-        setError(false)
+        setError(false);
         closeHandle(props);
-        setRender(false)
+        setRender(false);
+    }
+    function handleResize(){
+        reset_animation();
     }
     return(
         <React.Fragment>
@@ -321,7 +351,7 @@ const AudioPlayer = props => {
                 </WindowsError>
             )}
             {isRender && (
-                <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} drag={true} onclose={closeComponent}>
+                <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} drag={true} onclose={closeComponent} onResize={handleResize}>
                     <div className = "musicPlayer_grid">
                         <audio className = "musicPlayer_audio" />
                         <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">

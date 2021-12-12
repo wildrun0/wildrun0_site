@@ -12,8 +12,6 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
-let first_run = false;
-
 const defaultX = 350;
 const defaultY = 350;
 
@@ -23,9 +21,6 @@ let sizeY = defaultY;
 let pixelRatio = window.devicePixelRatio;
 const Main = () => {
     const [rerender, setRerender] = useState(false);
-    if (!first_run){
-        first_run = true;
-    }
     function change_resolution(action, e){
         if (action === "maximized"){
             sizeX = e.offsetWidth - 25;

@@ -1,49 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import Draggable from 'react-draggable';
 
-let pageWidth  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-let pageHeight = window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
-
-pageHeight = pageHeight - 6;
-
-// конвертирует touch-нажатия в click для совместимости
-// touchend вместо touchstart чтобы отрабатывать точнее
-var touchmove;
-document.addEventListener('touchend', (e) => {
+let touchmove;
+function touchToClick(e){
     if (touchmove !== true){
         e.preventDefault();
         e.target.click();
     }
-})
+}
+function setTouchMove(e){
+    let eventType = e.type;
+    if (eventType === "touchmove"){
+        touchmove = true;
+    } else{
+        touchmove = false;
+    }
+}
 
-//защита от клика когда свайпаешь
-document.addEventListener("touchmove", (e) =>{
-    touchmove = true;
-})
-document.addEventListener("touchstart", (e) =>{
-    touchmove = false;
-})
+function getNumbersFromString(numberString){
+    var regx = numberString.match(/-?\d+/g).map(Number);
+    return regx;
+}
 
 let div_params = {}
-
 const WindowsDiv = props => {
+    // конвертирует touch-нажатия в click для совместимости
+    // touchend вместо touchstart чтобы отрабатывать точнее
+    document.addEventListener('touchend', touchToClick);
+
+    //защита от клика когда свайпаешь
+    document.addEventListener("touchmove", setTouchMove);
+    document.addEventListener("touchstart", setTouchMove);
+
     const [render, setRender] = useState(true);
+    const [is_draggable, setDraggable] = useState(props.drag || false)
     let to_apply = {}
-    let is_draggable = props.drag || false;
     let have_rights = true;
+
     // запрещаем расширять окна с ошибками т.к. уродство
     if (props.className.includes("error")){
         have_rights = false;
     }
     useEffect(() => {
-        function handleResize(e){
-            pageWidth  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-            pageHeight = window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
-            pageHeight = pageHeight - 6;
-        }
-        window.addEventListener('resize', handleResize);
         return () =>{
-            window.removeEventListener('resize', handleResize)
+            document.removeEventListener('touchend', touchToClick)
+            document.removeEventListener("touchmove", setTouchMove)
+            document.removeEventListener("touchstart", setTouchMove)
         }
     }, [])
     function teleport_end(e){
@@ -51,15 +53,24 @@ const WindowsDiv = props => {
             let obj = e.target.parentNode.parentNode
             let style = obj.style;
             let pos = style.transform || style.webkitTransform || style.mozTransform;
-            sessionStorage.setItem(props.title, pos);
+            let coords;
+            try{
+                coords = getNumbersFromString(pos)
+            } catch{}
+            sessionStorage.setItem(props.title, coords);
         }
     }
 
     let transform = sessionStorage.getItem(props.title);
     try{
-        let coords = transform.replace("translate", "").replace("(","").replace(")", "").split(',');
-        to_apply["x"] = parseInt(coords[0].replace('px',""));
-        to_apply["y"] = parseInt(coords[1].replace('px', ''));
+        let coords = transform.split(',');
+        if(coords[0] === "undefined"){
+            to_apply["x"] = 0;
+            to_apply["y"] = 0;
+        } else{
+            to_apply["x"] = parseInt(coords[0]);
+            to_apply["y"] = parseInt(coords[1]);
+        }
     } catch (err) {
         to_apply["x"] = 0;
         to_apply["y"] = 0;
@@ -88,11 +99,14 @@ const WindowsDiv = props => {
                 div_element.getElementsByClassName("window")[0].style.height = params[6]
                 delete div_params[div]
                 div_element.classList.remove("maximized");
-                is_draggable = props.drag || false;
+                setDraggable(props.drag || false);
                 if (props.onResize !== undefined){
                     props.onResize('unmaximized', div_element)
                 }
             } else{
+                let pageWidth  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                let pageHeight = window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
+                pageHeight = pageHeight - 6;
                 div_params[div] = [
                     div_element.style.position, div_element.style.top, 
                     div_element.style.left, div_element.style.transform, 
@@ -109,7 +123,7 @@ const WindowsDiv = props => {
                 `;
                 div_element.getElementsByClassName("window")[0].style.height = pageHeight+"px";
                 div_element.classList.add('maximized');
-                is_draggable = false;
+                setDraggable(false);
                 if (props.onResize !== undefined){
                     props.onResize('maximized', div_element)
                 }
