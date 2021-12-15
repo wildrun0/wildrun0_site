@@ -86,13 +86,11 @@ hr{
     width: 250px;
 }
 .fileCreateDate{
-    letter-spacing: 0.02em;
     white-space: nowrap;
 }
 .fileSize{
     width: 45px;
     text-align: right;
-    letter-spacing: 0.05em;
 }
 @media (min-width:501px) {
     .fileListElement img{
