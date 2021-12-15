@@ -2,47 +2,47 @@ import React, {useEffect, useState} from 'react';
 import { openDB, deleteDB } from 'idb'
 import WindowsDiv from './WindowsDiv';
 import './styles/AudioPlayer.css';
-import yandhiCover from '../icons/programms_stuff/yandhi.mp4';
 import WindowsError from './WindowsError';
+import noSongPng from "../icons/programms_stuff/nosong.png"
 
 const api_addr = process.env.REACT_APP_API_ADDRESS;
 
 let db_init = false;
 let update_required = false;
-const dbName = 'songsDb'
-const storeName = 'songs'
-const version = 1 //versions start at 1
+const dbName = 'songsDb';
+const storeName = 'songs';
+const version = 1;
 async function init_db(){
     await openDB(dbName, version,{
         upgrade(db, oldVersion, newVersion, transaction) {
-            db.createObjectStore(storeName)
+            db.createObjectStore(storeName);
         }
     })
 }
 async function cache_song(songName, params){
-    const db = await openDB(dbName)
+    const db = await openDB(dbName);
 
-    const tx = db.transaction(storeName, 'readwrite')
-    const store = await tx.objectStore(storeName)
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = await tx.objectStore(storeName);
   
-    await store.put(params, songName)
-    await tx.done
+    await store.put(params, songName);
+    await tx.done;
 }
 async function get_cached_song(key){
-    const db = await openDB(dbName)
-    const item = await db.transaction(storeName).objectStore(storeName).get(key)
-    return item
+    const db = await openDB(dbName);
+    const item = await db.transaction(storeName).objectStore(storeName).get(key);
+    return item;
 }
 async function delete_db(name){
-    await deleteDB(name)
+    await deleteDB(name);
 }
 
-let cover
-let title
-let bitrate
-let duration
-let track
-let audio
+let cover;
+let title;
+let bitrate;
+let duration;
+let track;
+let audio;
 function reset_animation(){
     let el = document.getElementsByClassName("musicPlayer_trackName")[0];
     el.style.animation = 'none';
@@ -53,8 +53,14 @@ function reset_animation(){
     } else{
         animation = 'slide-left 20s linear infinite';
     }
+    window.requestAnimationFrame = window.requestAnimationFrame ||
+                               window.mozRequestAnimationFrame ||
+                               window.webkitRequestAnimationFrame ||             
+                               window.msRequestAnimationFrame;
     window.requestAnimationFrame(function(){
         el.style.animation = animation;
+        console.log('here')
+        console.log(el)
     });
 }
 let selectedSongs = [];
@@ -64,6 +70,8 @@ let song_playing = false;
 let audio_val = localStorage.getItem("audio_val") || 0.25;
 
 let audioSrc;
+let audioCover;
+let audioCoverFormat;
 let prev_song;
 let countDown;
 
@@ -92,7 +100,9 @@ function count_time(song_duration){
 function handleTrackMovement(){
     chaningCurrentTime = true
 }
-
+function get_url_extension( url ) {
+    return url.split(/[#?]/)[0].split('.').pop().trim();
+}
 async function setAudio(url, song_hash, song_element){
     let headers;
     let kbit;
@@ -169,13 +179,23 @@ async function setAudio(url, song_hash, song_element){
         track.max = song_duration;
     }
     audio.addEventListener("loadedmetadata", load_metadata);
-    
-    cover.play();
+
+    let audioCoverExt = get_url_extension(audioCover)
+    if ((audioCoverExt == "jpg") || (audioCoverExt == "png") || (audioCoverExt == "gif")){
+        cover.src = '';
+        cover.poster = audioCover; // на случай, если обложка - не видео
+        audioCoverFormat = 'picture'
+    } else{
+        cover.src = audioCover;
+        cover.play();
+        audioCoverFormat = "video"
+    }
 
     audio.onended = () => {
         audio.currentTime = 0;
-
-        cover.pause();
+        if (audioCoverFormat == "video"){
+            cover.pause();
+        }
         cover.currentTime = 0;
 
         title.innerHTML = ""
@@ -209,14 +229,18 @@ async function setAudio(url, song_hash, song_element){
 
 async function play_music(song, song_hash){
     if (!after_pause){
-        cover.pause();
+        if (audioCoverFormat == "video"){
+            cover.pause();
+        }
         cover.currentTime = 0;
         reset_animation();
     } else{
         title.style.animationPlayState = "running";
         after_pause = false;
         audio.play();
-        cover.play();
+        if (audioCoverFormat == "video"){
+            cover.play();
+        }
     }
     song_playing = true;
     if (prev_song !== song){
@@ -230,7 +254,9 @@ async function play_music(song, song_hash){
 
 function pauseSong(){
     if (song_playing){
-        cover.pause();
+        if (audioCoverFormat == "video"){
+            cover.pause();
+        }
         title.style.animationPlayState = "paused";
         title.innerHTML = "PAUSED: " + title.innerHTML;
         audio.pause();
@@ -243,6 +269,7 @@ function setSong(name){
     if (!song_playing && selectedSongs.length > 0){
         let song_hash = name.getAttribute("data-key")
         audioSrc = name.getAttribute("link");
+        audioCover = name.getAttribute("cover");
         title.innerHTML = name.textContent;
         play_music(name, song_hash)
     }
@@ -287,7 +314,6 @@ function closeHandle(props){
 function touchToMouse(e){
     e.target.dispatchEvent(new MouseEvent("mousedown"))
 }
-
 const AudioPlayer = props => {
     if (update_required){
         delete_db(dbName)
@@ -316,7 +342,6 @@ const AudioPlayer = props => {
         track.addEventListener("mousedown", handleTrackMovement);
         track.addEventListener('change', onTrackMovement);
         document.addEventListener("touchstart", touchToMouse)
-
         fetch(`${api_addr}/files/music`)
         .then(res => res.json())
         .then(
@@ -332,7 +357,7 @@ const AudioPlayer = props => {
             clearInterval(countDown);
             track.removeEventListener("mousedown", handleTrackMovement);
             track.removeEventListener('change', onTrackMovement);
-            document.removeEventListener("touchstart", touchToMouse)
+            document.removeEventListener("touchstart", touchToMouse);
         }
     }, [])
     function closeComponent(){
@@ -354,8 +379,8 @@ const AudioPlayer = props => {
                 <WindowsDiv title={props.name} className="musicPlayer_window" enableControls={true} drag={true} onclose={closeComponent} onResize={handleResize}>
                     <div className = "musicPlayer_grid">
                         <audio className = "musicPlayer_audio" />
-                        <video preload="auto" loop muted playsInline className="musicPlayer_coverTag">
-                            <source src={yandhiCover + "#t=0.1"} type="video/mp4" />
+                        <video poster={noSongPng} preload="auto" loop muted playsInline className="musicPlayer_coverTag">
+                            <source type="video/mp4"/>
                         </video>
                         <div className = "musicPlayer_player">
                             <p className = "musicPlayer_currentlyPlaying"> Currently playing </p>
@@ -363,10 +388,12 @@ const AudioPlayer = props => {
                             <div className = "musicPlayer_songsList" onClick={songClicked}>
                                 {
                                     items.map((song) =>{
+                                        let song_path = api_addr+"/files/music/"+song[0];
                                         let hash = song[1];
-                                        let song_name = song[0];
+                                        let song_name = song[0].split("/")[1];
+                                        let cover = api_addr+"/files/music/"+song[2];
                                         return(
-                                            <p data-key={hash} key={hash} link={api_addr+"/files/music/"+song_name}> {song_name} </p>
+                                            <p cover={cover} data-key={hash} key={hash} link={song_path}> {song_name} </p>
                                         )
                                     })
                                 }

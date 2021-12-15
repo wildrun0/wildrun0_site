@@ -19,6 +19,7 @@ CORS(app)
 
 def md5(fname):
     hash_md5 = hashlib.md5()
+    fname = os.path.normpath(fname)
     with open(fname, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
@@ -50,14 +51,28 @@ def get_advanced_files_info(_root, files):
         file_info.append([file, last_modified_date, file_size]) 
     return file_info
 
-def list_folder(path, check_md5=False):
-    files = []
-    for i in os.listdir(path):
-        if check_md5:
-            md5_file_hash = md5(path+i)
-            i = [i, md5_file_hash]
-        files.append(i)
-    return files
+def list_music_folder(path, check_md5=False):
+    songs_list = []
+    for folder in os.listdir(path):
+        album_cover = None
+        files = [folder, os.listdir(path+folder)]
+    
+        album_name = files[0]
+        album_files = files[1]
+        
+        for i in album_files:
+            if 'cover' in i:
+                album_cover = album_name+'/'+i
+                del album_files[album_files.index(i)]
+        for file in album_files:
+            song = file
+            if check_md5:
+                song_hash = md5(path+album_name+'/'+song)
+            else:
+                song_hash = None
+            song_and_path = album_name+'/'+song
+            songs_list.append([song_and_path, song_hash, album_cover])
+    return songs_list
 
 def tree_dir(startpath):
     paths = []
@@ -77,11 +92,11 @@ def list_files():
 
 @app.route("/files/music", methods=["GET"])
 def list_music():
-    files = list_folder(app.config['UPLOAD_FOLDER']+"/music/", check_md5=True)
+    files = list_music_folder(app.config['UPLOAD_FOLDER']+"/music/", check_md5=True)
     return jsonify(files)
 
 @app.route('/files/<path:file>', methods=["GET"])
-def send_file(file):    
+def send_file(file):
     return send_from_directory(app.config["UPLOAD_FOLDER"], file, as_attachment=True)
 
 if __name__ == "__main__":

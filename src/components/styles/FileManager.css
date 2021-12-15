@@ -84,7 +84,6 @@ hr{
     overflow: hidden;
     white-space: nowrap;
     width: 250px;
-    letter-spacing: 0.015em;
 }
 .fileCreateDate{
     letter-spacing: 0.02em;
